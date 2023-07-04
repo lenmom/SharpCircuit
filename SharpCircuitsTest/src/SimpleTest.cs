@@ -6,12 +6,9 @@ using SharpCircuit;
 
 namespace SharpCircuitTest
 {
-
     public class SimpleTest
     {
-
         //Assert.That(1.0, Is.EqualTo(1.5).Within(0.5f));
-
         [Test]
         public void AnalogSwitchTest()
         {
