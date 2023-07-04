@@ -1,48 +1,49 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+namespace SharpCircuit
+{
 
-namespace SharpCircuit {
+    public class LEDMatrixElm : Chip
+    {
 
-	public class LEDMatrixElm : Chip {
+        public bool negateRows { get; set; }
+        public bool negateColumns { get; set; }
 
-		public bool negateRows { get; set; }
-		public bool negateColumns { get; set; }
+        public double colorR { get; set; }
+        public double colorG { get; set; }
+        public double colorB { get; set; }
 
-		public double colorR { get; set; }
-		public double colorG { get; set; }
-		public double colorB { get; set; }
+        public LEDMatrixElm() : base()
+        {
+            colorR = 1;
+        }
 
-		public LEDMatrixElm() : base() {
-			colorR = 1;
-		}
+        public override string getChipName()
+        {
+            return "LED Matrix";
+        }
 
-		public override String getChipName() {
-			return "LED Matrix";
-		}
+        public override void setupPins()
+        {
+            pins = new Pin[16];
+            pins[0] = new Pin("R0");
+            pins[1] = new Pin("R1");
+            pins[2] = new Pin("R2");
+            pins[3] = new Pin("R3");
+            pins[4] = new Pin("R4");
+            pins[5] = new Pin("R5");
+            pins[6] = new Pin("R6");
+            pins[7] = new Pin("R7");
 
-		public override void setupPins() {
-			pins = new Pin[16];
-			pins[0] = new Pin("R0");
-			pins[1] = new Pin("R1");
-			pins[2] = new Pin("R2");
-			pins[3] = new Pin("R3");
-			pins[4] = new Pin("R4");
-			pins[5] = new Pin("R5");
-			pins[6] = new Pin("R6");
-			pins[7] = new Pin("R7");
+            pins[8] = new Pin("C0");
+            pins[9] = new Pin("C1");
+            pins[10] = new Pin("C2");
+            pins[11] = new Pin("C3");
+            pins[12] = new Pin("C4");
+            pins[13] = new Pin("C5");
+            pins[14] = new Pin("C6");
+            pins[15] = new Pin("C7");
+        }
 
-			pins[8] = new Pin("C0");
-			pins[9] = new Pin("C1");
-			pins[10] = new Pin("C2");
-			pins[11] = new Pin("C3");
-			pins[12] = new Pin("C4");
-			pins[13] = new Pin("C5");
-			pins[14] = new Pin("C6");
-			pins[15] = new Pin("C7");
-		}
-
-		/*public override void draw(Graphics g) {
+        /*public override void draw(Graphics g) {
 			drawChip(g);
 			Color color = new Color((int) (colorR * 255), (int) (colorG * 255),
 					(int) (colorB * 255));
@@ -64,13 +65,15 @@ namespace SharpCircuit {
 			}
 		}*/
 
-		public override int getLeadCount() {
-			return 16;
-		}
+        public override int getLeadCount()
+        {
+            return 16;
+        }
 
-		public override int getVoltageSourceCount() {
-			return 0;
-		}
+        public override int getVoltageSourceCount()
+        {
+            return 0;
+        }
 
-	}
+    }
 }

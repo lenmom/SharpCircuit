@@ -1,17 +1,16 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+namespace SharpCircuit
+{
 
-namespace SharpCircuit {
-	
-	public class ACVoltageSource : Voltage {
+    public class ACVoltageSource : Voltage
+    {
 
-		public Circuit.Lead leadPos { get { return lead0; } }
-		public Circuit.Lead leadNeg { get { return lead1; } }
+        public Circuit.Lead leadPos { get { return lead0; } }
+        public Circuit.Lead leadNeg { get { return lead1; } }
 
-		public ACVoltageSource() : base(WaveType.AC) {
+        public ACVoltageSource() : base(WaveType.AC)
+        {
 
-		}
+        }
 
-	}
+    }
 }

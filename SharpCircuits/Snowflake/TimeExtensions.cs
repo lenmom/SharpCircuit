@@ -5,7 +5,7 @@ namespace Snowflake
     public static class System
     {
         public static Func<long> currentTimeFunc = InternalCurrentTimeMillis;
- 
+
         public static long CurrentTimeMillis()
         {
             return currentTimeFunc();
@@ -17,7 +17,7 @@ namespace Snowflake
             return new DisposableAction(() =>
             {
                 currentTimeFunc = InternalCurrentTimeMillis;
-            });  
+            });
         }
 
         public static IDisposable StubCurrentTime(long millis)
@@ -35,6 +35,6 @@ namespace Snowflake
         private static long InternalCurrentTimeMillis()
         {
             return (long)(DateTime.UtcNow - Jan1st1970).TotalMilliseconds;
-        }        
+        }
     }
 }

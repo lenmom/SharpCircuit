@@ -1,14 +1,13 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+namespace SharpCircuit
+{
 
-namespace SharpCircuit {
+    public class PMosfet : Mosfet
+    {
 
-	public class PMosfet : Mosfet {
-		
-		public PMosfet() : base(true) {
-			
-		}
-		
-	}
+        public PMosfet() : base(true)
+        {
+
+        }
+
+    }
 }

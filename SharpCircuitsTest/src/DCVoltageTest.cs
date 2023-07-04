@@ -1,116 +1,123 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
-using SharpCircuit;
 using NUnit.Framework;
 
-namespace SharpCircuitTest {
+using SharpCircuit;
 
-	[TestFixture]
-	public class DCVoltageTest {
+namespace SharpCircuitTest
+{
 
-		[Test]
-		public void CapacitorTest() {
-			Circuit sim = new Circuit();
+    [TestFixture]
+    public class DCVoltageTest
+    {
 
-			var volt0 = sim.Create<DCVoltageSource>();
-			var cap0 = sim.Create<CapacitorElm>(2E-4);
-			var res0 = sim.Create<Resistor>();
+        [Test]
+        public void CapacitorTest()
+        {
+            Circuit sim = new Circuit();
 
-			var switch0 = sim.Create<SwitchSPDT>();
+            DCVoltageSource volt0 = sim.Create<DCVoltageSource>();
+            CapacitorElm cap0 = sim.Create<CapacitorElm>(2E-4);
+            Resistor res0 = sim.Create<Resistor>();
 
-			/*sim.Connect(volt0, 1, switch0, 1);
+            SwitchSPDT switch0 = sim.Create<SwitchSPDT>();
+
+            /*sim.Connect(volt0, 1, switch0, 1);
 			sim.Connect(switch0, 1, switch0, 1);
 			sim.Connect(switch0, 2, res0, 1);
 			sim.Connect(cap0, 1, res0, 0);
 			sim.Connect(res0, 1, volt0, 0);*/
 
-			// leadNeg 0
-			// leadPos 1
+            // leadNeg 0
+            // leadPos 1
 
-			sim.Connect(volt0, 1, switch0, 1);
-			sim.Connect(switch0, 0, cap0, 0);
-			sim.Connect(cap0, 1, res0, 0);
-			sim.Connect(res0, 1, volt0, 0);
-			sim.Connect(switch0, 2, volt0, 0);
+            sim.Connect(volt0, 1, switch0, 1);
+            sim.Connect(switch0, 0, cap0, 0);
+            sim.Connect(cap0, 1, res0, 0);
+            sim.Connect(res0, 1, volt0, 0);
+            sim.Connect(switch0, 2, volt0, 0);
 
-			switch0.setPosition(0);
+            switch0.setPosition(0);
 
-			var capScope0 = sim.Watch(cap0);
+            List<ScopeFrame> capScope0 = sim.Watch(cap0);
 
-			for(int x = 1; x <= 28000; x++)
-				sim.doTick();
+            for (int x = 1; x <= 28000; x++)
+            {
+                sim.doTick();
+            }
 
-			Debug.LogF("{0} [{1}]", sim.time, SIUnits.Normalize(sim.time, "s"));
-			{
-				double voltageHigh = capScope0.Max((f) => f.voltage);
-				int voltageHighNdx = capScope0.FindIndex((f) => f.voltage == voltageHigh);
+            Debug.LogF("{0} [{1}]", sim.time, SIUnits.Normalize(sim.time, "s"));
+            {
+                double voltageHigh = capScope0.Max((f) => f.voltage);
+                int voltageHighNdx = capScope0.FindIndex((f) => f.voltage == voltageHigh);
 
-				Debug.Log("voltageHigh", voltageHigh, voltageHighNdx);
+                Debug.Log("voltageHigh", voltageHigh, voltageHighNdx);
 
-				double voltageLow = capScope0.Min((f) => f.voltage);
-				int voltageLowNdx = capScope0.FindIndex((f) => f.voltage == voltageLow);
+                double voltageLow = capScope0.Min((f) => f.voltage);
+                int voltageLowNdx = capScope0.FindIndex((f) => f.voltage == voltageLow);
 
-				Debug.Log("voltageLow ", voltageLow, voltageLowNdx);
+                Debug.Log("voltageLow ", voltageLow, voltageLowNdx);
 
-				double currentHigh = capScope0.Max((f) => f.current);
-				int currentHighNdx = capScope0.FindIndex((f) => f.current == currentHigh);
-				Debug.Log("currentHigh", currentHigh, currentHighNdx);
+                double currentHigh = capScope0.Max((f) => f.current);
+                int currentHighNdx = capScope0.FindIndex((f) => f.current == currentHigh);
+                Debug.Log("currentHigh", currentHigh, currentHighNdx);
 
-				double currentLow = capScope0.Min((f) => f.current);
-				int currentLowNdx = capScope0.FindIndex((f) => f.current == currentLow);
+                double currentLow = capScope0.Min((f) => f.current);
+                int currentLowNdx = capScope0.FindIndex((f) => f.current == currentLow);
 
-				Debug.Log("currentLow ", currentLow, currentLowNdx);
+                Debug.Log("currentLow ", currentLow, currentLowNdx);
 
-				Assert.AreEqual(27999, voltageHighNdx);
-				Assert.AreEqual(    0, voltageLowNdx);
-				
-				Assert.AreEqual(    0, currentHighNdx);
-				Assert.AreEqual(27999, currentLowNdx);
-			}
+                Assert.AreEqual(27999, voltageHighNdx);
+                Assert.AreEqual(0, voltageLowNdx);
 
-			switch0.setPosition(1);
-			sim.analyze();
-			capScope0.Clear();
+                Assert.AreEqual(0, currentHighNdx);
+                Assert.AreEqual(27999, currentLowNdx);
+            }
 
-			for(int x = 1; x <= 28000; x++)
-				sim.doTick();
+            switch0.setPosition(1);
+            sim.analyze();
+            capScope0.Clear();
 
-			Debug.Log();
+            for (int x = 1; x <= 28000; x++)
+            {
+                sim.doTick();
+            }
 
-			Debug.LogF("{0} [{1}]", sim.time, SIUnits.Normalize(sim.time, "s"));
-			{
-				double voltageHigh = capScope0.Max((f) => f.voltage);
-				int voltageHighNdx = capScope0.FindIndex((f) => f.voltage == voltageHigh);
+            Debug.Log();
 
-				Debug.Log("voltageHigh ", voltageHigh, voltageHighNdx);
+            Debug.LogF("{0} [{1}]", sim.time, SIUnits.Normalize(sim.time, "s"));
+            {
+                double voltageHigh = capScope0.Max((f) => f.voltage);
+                int voltageHighNdx = capScope0.FindIndex((f) => f.voltage == voltageHigh);
 
-				double voltageLow = capScope0.Min((f) => f.voltage);
-				int voltageLowNdx = capScope0.FindIndex((f) => f.voltage == voltageLow);
+                Debug.Log("voltageHigh ", voltageHigh, voltageHighNdx);
 
-				Debug.Log("voltageLow  ", voltageLow, voltageLowNdx);
+                double voltageLow = capScope0.Min((f) => f.voltage);
+                int voltageLowNdx = capScope0.FindIndex((f) => f.voltage == voltageLow);
 
-				double currentHigh = capScope0.Max((f) => f.current);
-				int currentHighNdx = capScope0.FindIndex((f) => f.current == currentHigh);
-				Debug.Log("currentHigh", currentHigh, currentHighNdx);
+                Debug.Log("voltageLow  ", voltageLow, voltageLowNdx);
 
-				double currentLow = capScope0.Min((f) => f.current);
-				int currentLowNdx = capScope0.FindIndex((f) => f.current == currentLow);
+                double currentHigh = capScope0.Max((f) => f.current);
+                int currentHighNdx = capScope0.FindIndex((f) => f.current == currentHigh);
+                Debug.Log("currentHigh", currentHigh, currentHighNdx);
 
-				Debug.Log("currentLow ", currentLow, currentLowNdx);
+                double currentLow = capScope0.Min((f) => f.current);
+                int currentLowNdx = capScope0.FindIndex((f) => f.current == currentLow);
 
-				Assert.AreEqual(voltageHighNdx, currentLowNdx);
-				Assert.AreEqual(voltageLowNdx, currentHighNdx);
+                Debug.Log("currentLow ", currentLow, currentLowNdx);
 
-				Assert.AreEqual(    0, voltageHighNdx);
-				Assert.AreEqual(27999, voltageLowNdx);
+                Assert.AreEqual(voltageHighNdx, currentLowNdx);
+                Assert.AreEqual(voltageLowNdx, currentHighNdx);
 
-				Assert.AreEqual(27999, currentHighNdx);
-				Assert.AreEqual(    0, currentLowNdx);
-			}
+                Assert.AreEqual(0, voltageHighNdx);
+                Assert.AreEqual(27999, voltageLowNdx);
 
-		}
+                Assert.AreEqual(27999, currentHighNdx);
+                Assert.AreEqual(0, currentLowNdx);
+            }
 
-	}
+        }
+
+    }
 }

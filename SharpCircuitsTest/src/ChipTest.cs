@@ -1,215 +1,238 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using NUnit.Framework;
 
 using SharpCircuit;
-using NUnit.Framework;
 
-namespace SharpCircuitTest {
+namespace SharpCircuitTest
+{
 
-	[TestFixture]
-	public class ChipTest {
+    [TestFixture]
+    public class ChipTest
+    {
 
-		[Test]
-		public void CounterTest() {
-			Circuit sim = new Circuit();
+        [Test]
+        public void CounterTest()
+        {
+            Circuit sim = new Circuit();
 
-			var logicIn0 = sim.Create<LogicInput>();
-			var logicIn1 = sim.Create<LogicInput>();
+            LogicInput logicIn0 = sim.Create<LogicInput>();
+            LogicInput logicIn1 = sim.Create<LogicInput>();
 
-			var counter0 = sim.Create<CounterElm>();
-		}
+            CounterElm counter0 = sim.Create<CounterElm>();
+        }
 
-		[TestCase(0, 0, 0)]
-		[TestCase(1, 0, 1)]
-		[TestCase(0, 1, 1)]
-		[TestCase(1, 1, 2)]
-		public void HalfAdderTest(int in0, int in1, int i0) {
-			Circuit sim = new Circuit();
+        [TestCase(0, 0, 0)]
+        [TestCase(1, 0, 1)]
+        [TestCase(0, 1, 1)]
+        [TestCase(1, 1, 2)]
+        public void HalfAdderTest(int in0, int in1, int i0)
+        {
+            Circuit sim = new Circuit();
 
-			var logicIn0 = sim.Create<LogicInput>();
-			var logicIn1 = sim.Create<LogicInput>();
+            LogicInput logicIn0 = sim.Create<LogicInput>();
+            LogicInput logicIn1 = sim.Create<LogicInput>();
 
-			var chip0 = sim.Create<HalfAdder>();
+            HalfAdder chip0 = sim.Create<HalfAdder>();
 
-			var logicOut0 = sim.Create<LogicOutput>();
-			var logicOut1 = sim.Create<LogicOutput>();
+            LogicOutput logicOut0 = sim.Create<LogicOutput>();
+            LogicOutput logicOut1 = sim.Create<LogicOutput>();
 
-			sim.Connect(logicIn0.leadOut, chip0.leadIn0);
-			sim.Connect(logicIn1.leadOut, chip0.leadIn1);
+            sim.Connect(logicIn0.leadOut, chip0.leadIn0);
+            sim.Connect(logicIn1.leadOut, chip0.leadIn1);
 
-			sim.Connect(logicOut0.leadIn, chip0.leadOut1);
-			sim.Connect(logicOut1.leadIn, chip0.leadOut2);
-			
-			logicIn0.setPosition(in0);
-			logicIn1.setPosition(in1);
-			sim.analyze();
+            sim.Connect(logicOut0.leadIn, chip0.leadOut1);
+            sim.Connect(logicOut1.leadIn, chip0.leadOut2);
 
-			for(int x = 1; x <= 100; x++)
-				sim.doTick();
+            logicIn0.setPosition(in0);
+            logicIn1.setPosition(in1);
+            sim.analyze();
 
-			int i = 0;
-			if(logicOut0.isHigh()) i += 2;
-			if(logicOut1.isHigh()) i += 1;
-			
-			Assert.AreEqual(i0, i);
-		}
+            for (int x = 1; x <= 100; x++)
+            {
+                sim.doTick();
+            }
 
-		[TestCase(0, 0, 0, 0)]
-		[TestCase(1, 0, 0, 1)]
-		[TestCase(0, 1, 0, 1)]
-		[TestCase(0, 0, 1, 1)]
-		[TestCase(1, 1, 0, 2)]
-		[TestCase(1, 0, 1, 2)]
-		[TestCase(0, 1, 1, 2)]
-		[TestCase(1, 1, 1, 3)]
-		public void FullAdderTest(int in0, int in1, int in2, int i0) {
-			Circuit sim = new Circuit();
+            int i = 0;
+            if (logicOut0.isHigh())
+            {
+                i += 2;
+            }
 
-			var logicIn0 = sim.Create<LogicInput>();
-			var logicIn1 = sim.Create<LogicInput>();
-			var logicIn2 = sim.Create<LogicInput>();
+            if (logicOut1.isHigh())
+            {
+                i += 1;
+            }
 
-			var chip0 = sim.Create<FullAdder>();
+            Assert.AreEqual(i0, i);
+        }
 
-			var logicOut0 = sim.Create<LogicOutput>();
-			var logicOut1 = sim.Create<LogicOutput>();
+        [TestCase(0, 0, 0, 0)]
+        [TestCase(1, 0, 0, 1)]
+        [TestCase(0, 1, 0, 1)]
+        [TestCase(0, 0, 1, 1)]
+        [TestCase(1, 1, 0, 2)]
+        [TestCase(1, 0, 1, 2)]
+        [TestCase(0, 1, 1, 2)]
+        [TestCase(1, 1, 1, 3)]
+        public void FullAdderTest(int in0, int in1, int in2, int i0)
+        {
+            Circuit sim = new Circuit();
 
-			sim.Connect(logicIn0.leadOut, chip0.leadIn0);
-			sim.Connect(logicIn1.leadOut, chip0.leadIn1);
-			sim.Connect(logicIn2.leadOut, chip0.leadIn2);
+            LogicInput logicIn0 = sim.Create<LogicInput>();
+            LogicInput logicIn1 = sim.Create<LogicInput>();
+            LogicInput logicIn2 = sim.Create<LogicInput>();
 
-			sim.Connect(logicOut0.leadIn, chip0.leadOut1);
-			sim.Connect(logicOut1.leadIn, chip0.leadOut2);
+            FullAdder chip0 = sim.Create<FullAdder>();
 
-			logicIn0.setPosition(in0);
-			logicIn1.setPosition(in1);
-			logicIn2.setPosition(in2);
-			sim.analyze();
+            LogicOutput logicOut0 = sim.Create<LogicOutput>();
+            LogicOutput logicOut1 = sim.Create<LogicOutput>();
 
-			for(int x = 1; x <= 100; x++)
-				sim.doTick();
+            sim.Connect(logicIn0.leadOut, chip0.leadIn0);
+            sim.Connect(logicIn1.leadOut, chip0.leadIn1);
+            sim.Connect(logicIn2.leadOut, chip0.leadIn2);
 
-			int i = 0;
-			if(logicOut0.isHigh()) i += 1;
-			if(logicOut1.isHigh()) i += 2;
-			
-			Assert.AreEqual(i0, i);
-		}
+            sim.Connect(logicOut0.leadIn, chip0.leadOut1);
+            sim.Connect(logicOut1.leadIn, chip0.leadOut2);
 
-		[Test]
-		public void DFlipFlopTest() {
-			Circuit sim = new Circuit();
+            logicIn0.setPosition(in0);
+            logicIn1.setPosition(in1);
+            logicIn2.setPosition(in2);
+            sim.analyze();
 
-			var logicIn0 = sim.Create<LogicInput>();
-			var logicIn1 = sim.Create<LogicInput>();
+            for (int x = 1; x <= 100; x++)
+            {
+                sim.doTick();
+            }
 
-			var dflip0 = sim.Create<DFlipFlop>();
+            int i = 0;
+            if (logicOut0.isHigh())
+            {
+                i += 1;
+            }
 
-			var logicOut0 = sim.Create<LogicOutput>();
-			var logicOut1 = sim.Create<LogicOutput>();
+            if (logicOut1.isHigh())
+            {
+                i += 2;
+            }
 
-			sim.Connect(logicIn0.leadOut, dflip0.leadD);
-			sim.Connect(logicIn1.leadOut, dflip0.leadCLK);
+            Assert.AreEqual(i0, i);
+        }
 
-			sim.Connect(logicOut0.leadIn, dflip0.leadQ);
-			sim.Connect(logicOut0.leadIn, dflip0.leadQL);
+        [Test]
+        public void DFlipFlopTest()
+        {
+            Circuit sim = new Circuit();
 
-			sim.doTicks(200);
+            LogicInput logicIn0 = sim.Create<LogicInput>();
+            LogicInput logicIn1 = sim.Create<LogicInput>();
 
-			Debug.Log();
-			Debug.Log("D  ", dflip0.getLeadVoltage(0));
-			Debug.Log("CLK", dflip0.getLeadVoltage(3));
-			Debug.Log(" Q ", dflip0.getLeadVoltage(1));
-			Debug.Log("|Q ", dflip0.getLeadVoltage(2));
-			Debug.Log();
+            DFlipFlop dflip0 = sim.Create<DFlipFlop>();
 
-			logicIn0.toggle();
-			logicIn1.toggle();
-			sim.analyze();
-			sim.doTicks(200);
+            LogicOutput logicOut0 = sim.Create<LogicOutput>();
+            LogicOutput logicOut1 = sim.Create<LogicOutput>();
 
-			Debug.Log();
-			Debug.Log("D  ", dflip0.getLeadVoltage(0));
-			Debug.Log("CLK", dflip0.getLeadVoltage(3));
-			Debug.Log(" Q ", dflip0.getLeadVoltage(1));
-			Debug.Log("|Q ", dflip0.getLeadVoltage(2));
-			Debug.Log();
+            sim.Connect(logicIn0.leadOut, dflip0.leadD);
+            sim.Connect(logicIn1.leadOut, dflip0.leadCLK);
 
-			logicIn0.toggle();
-			logicIn1.toggle();
-			sim.analyze();
-			sim.doTicks(200);
+            sim.Connect(logicOut0.leadIn, dflip0.leadQ);
+            sim.Connect(logicOut0.leadIn, dflip0.leadQL);
 
-			Debug.Log();
-			Debug.Log("D  ", dflip0.getLeadVoltage(0));
-			Debug.Log("CLK", dflip0.getLeadVoltage(3));
-			Debug.Log(" Q ", dflip0.getLeadVoltage(1));
-			Debug.Log("|Q ", dflip0.getLeadVoltage(2));
-			Debug.Log();
+            sim.doTicks(200);
 
-			Assert.Ignore();
-		}
+            Debug.Log();
+            Debug.Log("D  ", dflip0.getLeadVoltage(0));
+            Debug.Log("CLK", dflip0.getLeadVoltage(3));
+            Debug.Log(" Q ", dflip0.getLeadVoltage(1));
+            Debug.Log("|Q ", dflip0.getLeadVoltage(2));
+            Debug.Log();
 
-		[Test]
-		public void JKlipFlopTest() {
-			Assert.Ignore("Not Implemented!");
-		}
+            logicIn0.toggle();
+            logicIn1.toggle();
+            sim.analyze();
+            sim.doTicks(200);
 
-		[Test]
-		public void TFlipFlopTest() {
-			Circuit sim = new Circuit();
+            Debug.Log();
+            Debug.Log("D  ", dflip0.getLeadVoltage(0));
+            Debug.Log("CLK", dflip0.getLeadVoltage(3));
+            Debug.Log(" Q ", dflip0.getLeadVoltage(1));
+            Debug.Log("|Q ", dflip0.getLeadVoltage(2));
+            Debug.Log();
 
-			var logicIn0 = sim.Create<LogicInput>();
-			var logicIn1 = sim.Create<LogicInput>();
+            logicIn0.toggle();
+            logicIn1.toggle();
+            sim.analyze();
+            sim.doTicks(200);
 
-			var dflip0 = sim.Create<TFlipFlopElm>();
+            Debug.Log();
+            Debug.Log("D  ", dflip0.getLeadVoltage(0));
+            Debug.Log("CLK", dflip0.getLeadVoltage(3));
+            Debug.Log(" Q ", dflip0.getLeadVoltage(1));
+            Debug.Log("|Q ", dflip0.getLeadVoltage(2));
+            Debug.Log();
 
-			var logicOut0 = sim.Create<LogicOutput>();
-			var logicOut1 = sim.Create<LogicOutput>();
+            Assert.Ignore();
+        }
 
-			sim.Connect(logicIn0.leadOut, dflip0.leadT);
-			sim.Connect(logicIn1.leadOut, dflip0.leadCLK);
+        [Test]
+        public void JKlipFlopTest()
+        {
+            Assert.Ignore("Not Implemented!");
+        }
 
-			sim.Connect(logicOut0.leadIn, dflip0.leadQ);
-			sim.Connect(logicOut0.leadIn, dflip0.leadQL);
+        [Test]
+        public void TFlipFlopTest()
+        {
+            Circuit sim = new Circuit();
 
-			logicIn0.toggle();
-			sim.doTicks(200);
+            LogicInput logicIn0 = sim.Create<LogicInput>();
+            LogicInput logicIn1 = sim.Create<LogicInput>();
 
-			Debug.Log();
-			Debug.Log("T  ", dflip0.getLeadVoltage(0));
-			Debug.Log("CLK", dflip0.getLeadVoltage(3));
-			Debug.Log(" Q ", dflip0.getLeadVoltage(1));
-			Debug.Log("|Q ", dflip0.getLeadVoltage(2));
-			Debug.Log();
+            TFlipFlopElm dflip0 = sim.Create<TFlipFlopElm>();
 
-			//logicIn0.toggle();
-			logicIn1.toggle();
-			sim.analyze();
-			sim.doTicks(200);
+            LogicOutput logicOut0 = sim.Create<LogicOutput>();
+            LogicOutput logicOut1 = sim.Create<LogicOutput>();
 
-			Debug.Log();
-			Debug.Log("T  ", dflip0.getLeadVoltage(0));
-			Debug.Log("CLK", dflip0.getLeadVoltage(3));
-			Debug.Log(" Q ", dflip0.getLeadVoltage(1));
-			Debug.Log("|Q ", dflip0.getLeadVoltage(2));
-			Debug.Log();
+            sim.Connect(logicIn0.leadOut, dflip0.leadT);
+            sim.Connect(logicIn1.leadOut, dflip0.leadCLK);
 
-			//logicIn0.toggle();
-			logicIn1.toggle();
-			sim.analyze();
-			sim.doTicks(200);
+            sim.Connect(logicOut0.leadIn, dflip0.leadQ);
+            sim.Connect(logicOut0.leadIn, dflip0.leadQL);
 
-			Debug.Log();
-			Debug.Log("T  ", dflip0.getLeadVoltage(0));
-			Debug.Log("CLK", dflip0.getLeadVoltage(3));
-			Debug.Log(" Q ", dflip0.getLeadVoltage(1));
-			Debug.Log("|Q ", dflip0.getLeadVoltage(2));
-			Debug.Log();
+            logicIn0.toggle();
+            sim.doTicks(200);
 
-			Assert.Ignore();
-		}
+            Debug.Log();
+            Debug.Log("T  ", dflip0.getLeadVoltage(0));
+            Debug.Log("CLK", dflip0.getLeadVoltage(3));
+            Debug.Log(" Q ", dflip0.getLeadVoltage(1));
+            Debug.Log("|Q ", dflip0.getLeadVoltage(2));
+            Debug.Log();
 
-	}
+            //logicIn0.toggle();
+            logicIn1.toggle();
+            sim.analyze();
+            sim.doTicks(200);
+
+            Debug.Log();
+            Debug.Log("T  ", dflip0.getLeadVoltage(0));
+            Debug.Log("CLK", dflip0.getLeadVoltage(3));
+            Debug.Log(" Q ", dflip0.getLeadVoltage(1));
+            Debug.Log("|Q ", dflip0.getLeadVoltage(2));
+            Debug.Log();
+
+            //logicIn0.toggle();
+            logicIn1.toggle();
+            sim.analyze();
+            sim.doTicks(200);
+
+            Debug.Log();
+            Debug.Log("T  ", dflip0.getLeadVoltage(0));
+            Debug.Log("CLK", dflip0.getLeadVoltage(3));
+            Debug.Log(" Q ", dflip0.getLeadVoltage(1));
+            Debug.Log("|Q ", dflip0.getLeadVoltage(2));
+            Debug.Log();
+
+            Assert.Ignore();
+        }
+
+    }
 }

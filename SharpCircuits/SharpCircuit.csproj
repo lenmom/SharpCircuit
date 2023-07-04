@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SharpCircuit</RootNamespace>
     <AssemblyName>SharpCircuit</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -90,12 +91,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="src\elements\FMSource.cs" />
+    <Compile Include="src\elements\gate\AndGate.cs" />
+    <Compile Include="src\elements\gate\NandGate.cs" />
+    <Compile Include="src\elements\gate\NorGate.cs" />
+    <Compile Include="src\elements\gate\OrGate.cs" />
+    <Compile Include="src\elements\gate\XorGate.cs" />
     <Compile Include="src\elements\LogicGate.cs" />
-    <Compile Include="src\elements\gate\AndGateElm.cs" />
-    <Compile Include="src\elements\gate\NandGateElm.cs" />
-    <Compile Include="src\elements\gate\NorGateElm.cs" />
-    <Compile Include="src\elements\gate\OrGateElm.cs" />
-    <Compile Include="src\elements\gate\XorGateElm.cs" />
     <Compile Include="src\elements\Ground.cs" />
     <Compile Include="src\elements\InductorElm.cs" />
     <Compile Include="src\elements\Inverter.cs" />

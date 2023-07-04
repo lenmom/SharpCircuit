@@ -4,12 +4,15 @@ namespace Snowflake
 {
     public class DisposableAction : IDisposable
     {
-        readonly Action _action;
+        private readonly Action _action;
 
         public DisposableAction(Action action)
         {
             if (action == null)
+            {
                 throw new ArgumentNullException("action");
+            }
+
             _action = action;
         }
 

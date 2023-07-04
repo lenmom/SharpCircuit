@@ -1,12 +1,10 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+namespace SharpCircuit
+{
 
-namespace SharpCircuit {
+    public class NandGate : AndGate
+    {
 
-	public class NandGate : AndGate {
+        public override bool isInverting() { return true; }
 
-		public override bool isInverting() { return true; }
-
-	}
+    }
 }

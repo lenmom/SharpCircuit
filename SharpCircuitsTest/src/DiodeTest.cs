@@ -1,62 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
-using SharpCircuit;
-using ServiceStack.Text;
 using NUnit.Framework;
 
-namespace SharpCircuitTest {
-	
-	[TestFixture]
-	public class DiodeTest {
+using SharpCircuit;
 
-		[Test]
-		public void SimpleDiodeTest() {
-			Circuit sim = new Circuit();
+namespace SharpCircuitTest
+{
 
-			var voltage0 = sim.Create<VoltageInput>(Voltage.WaveType.AC);
-			var diode = sim.Create<DiodeElm>();
-			var ground = sim.Create<Ground>();
+    [TestFixture]
+    public class DiodeTest
+    {
 
-			sim.Connect(voltage0.leadPos, diode.leadIn);
-			sim.Connect(diode.leadOut, ground.leadIn);
+        [Test]
+        public void SimpleDiodeTest()
+        {
+            Circuit sim = new Circuit();
 
-			var diodeScope = sim.Watch(diode);
+            VoltageInput voltage0 = sim.Create<VoltageInput>(Voltage.WaveType.AC);
+            DiodeElm diode = sim.Create<DiodeElm>();
+            Ground ground = sim.Create<Ground>();
 
-			double cycleTime = 1 / voltage0.frequency;
-			double quarterCycleTime = cycleTime / 4;
+            sim.Connect(voltage0.leadPos, diode.leadIn);
+            sim.Connect(diode.leadOut, ground.leadIn);
 
-			int steps = (int)(cycleTime / sim.timeStep);
-			for(int x = 1; x <= steps; x++)
-				sim.doTick();
+            List<ScopeFrame> diodeScope = sim.Watch(diode);
 
-			double voltageHigh = diodeScope.Max((f) => f.voltage);
-			int voltageHighNdx = diodeScope.FindIndex((f) => f.voltage == voltageHigh);
+            double cycleTime = 1 / voltage0.frequency;
+            double quarterCycleTime = cycleTime / 4;
 
-			TestUtils.Compare(voltageHigh, voltage0.dutyCycle, 4);
-			TestUtils.Compare(diodeScope[voltageHighNdx].time, quarterCycleTime, 4);
+            int steps = (int)(cycleTime / sim.timeStep);
+            for (int x = 1; x <= steps; x++)
+            {
+                sim.doTick();
+            }
 
-			double voltageLow = diodeScope.Min((f) => f.voltage);
-			int voltageLowNdx = diodeScope.FindIndex((f) => f.voltage == voltageLow);
+            double voltageHigh = diodeScope.Max((f) => f.voltage);
+            int voltageHighNdx = diodeScope.FindIndex((f) => f.voltage == voltageHigh);
 
-			TestUtils.Compare(voltageLow, -voltage0.dutyCycle, 4);
-			TestUtils.Compare(diodeScope[voltageLowNdx].time, quarterCycleTime * 3, 4);
+            TestUtils.Compare(voltageHigh, voltage0.dutyCycle, 4);
+            TestUtils.Compare(diodeScope[voltageHighNdx].time, quarterCycleTime, 4);
 
-			double currentHigh = diodeScope.Max((f) => f.current);
-			int currentHighNdx = diodeScope.FindIndex((f) => f.current == currentHigh);
-			TestUtils.Compare(diodeScope[voltageHighNdx].time, diodeScope[currentHighNdx].time, 5);
+            double voltageLow = diodeScope.Min((f) => f.voltage);
+            int voltageLowNdx = diodeScope.FindIndex((f) => f.voltage == voltageLow);
 
-			double currentLow = diodeScope.Min((f) => f.current);
-			int currentLowNdx = diodeScope.FindIndex((f) => f.current == currentLow);
+            TestUtils.Compare(voltageLow, -voltage0.dutyCycle, 4);
+            TestUtils.Compare(diodeScope[voltageLowNdx].time, quarterCycleTime * 3, 4);
 
-			TestUtils.Compare(currentLow, 0, 8);
-		}
+            double currentHigh = diodeScope.Max((f) => f.current);
+            int currentHighNdx = diodeScope.FindIndex((f) => f.current == currentHigh);
+            TestUtils.Compare(diodeScope[voltageHighNdx].time, diodeScope[currentHighNdx].time, 5);
 
-		[Test]
-		public void HalfWaveRectifierTest(){
+            double currentLow = diodeScope.Min((f) => f.current);
+            int currentLowNdx = diodeScope.FindIndex((f) => f.current == currentLow);
 
-			/*string nm = TestContext.CurrentContext.Test.Name;
+            TestUtils.Compare(currentLow, 0, 8);
+        }
+
+        [Test]
+        public void HalfWaveRectifierTest()
+        {
+
+            /*string nm = TestContext.CurrentContext.Test.Name;
 			string js = System.IO.File.ReadAllText(string.Format("./{0}.json", nm));
 			Circuit sim = JsonSerializer.DeserializeFromString<Circuit>(js);
 			sim.needAnalyze();
@@ -65,67 +70,70 @@ namespace SharpCircuitTest {
 			var sourceScope = sim.Watch(sim.getElm(0));
 			var resScope = sim.Watch(sim.getElm(2));*/
 
-			Circuit sim = new Circuit();
-			
-			Voltage voltage0 = sim.Create<Voltage>(Voltage.WaveType.AC);
-			DiodeElm diode0 = sim.Create<DiodeElm>();
-			Resistor res0 = sim.Create<Resistor>(640);
-			Wire wire0 = sim.Create<Wire>();
+            Circuit sim = new Circuit();
 
-			sim.Connect(voltage0, 1, diode0, 0);
-			sim.Connect(diode0, 1, res0, 0);
-			sim.Connect(res0, 1, wire0, 0);
-			sim.Connect(wire0, 1, voltage0, 0);
+            Voltage voltage0 = sim.Create<Voltage>(Voltage.WaveType.AC);
+            DiodeElm diode0 = sim.Create<DiodeElm>();
+            Resistor res0 = sim.Create<Resistor>(640);
+            Wire wire0 = sim.Create<Wire>();
 
-			var voltScope = sim.Watch(voltage0);
-			var resScope = sim.Watch(res0);
+            sim.Connect(voltage0, 1, diode0, 0);
+            sim.Connect(diode0, 1, res0, 0);
+            sim.Connect(res0, 1, wire0, 0);
+            sim.Connect(wire0, 1, voltage0, 0);
 
-			double cycleTime = 1 / voltage0.frequency;
-			double quarterCycleTime = cycleTime / 4;
+            List<ScopeFrame> voltScope = sim.Watch(voltage0);
+            List<ScopeFrame> resScope = sim.Watch(res0);
 
-			int steps = (int)(cycleTime / sim.timeStep);
-			for(int x = 1; x <= steps; x++)
-				sim.doTick();
+            double cycleTime = 1 / voltage0.frequency;
+            double quarterCycleTime = cycleTime / 4;
 
-			// A/C Voltage Source
-			{
-				double voltageHigh = voltScope.Max((f) => f.voltage);
-				int voltageHighNdx = voltScope.FindIndex((f) => f.voltage == voltageHigh);
+            int steps = (int)(cycleTime / sim.timeStep);
+            for (int x = 1; x <= steps; x++)
+            {
+                sim.doTick();
+            }
 
-				TestUtils.Compare(voltageHigh, voltage0.dutyCycle, 4);
-				TestUtils.Compare(voltScope[voltageHighNdx].time, quarterCycleTime, 4);
+            // A/C Voltage Source
+            {
+                double voltageHigh = voltScope.Max((f) => f.voltage);
+                int voltageHighNdx = voltScope.FindIndex((f) => f.voltage == voltageHigh);
 
-				double voltageLow = voltScope.Min((f) => f.voltage);
-				int voltageLowNdx = voltScope.FindIndex((f) => f.voltage == voltageLow);
+                TestUtils.Compare(voltageHigh, voltage0.dutyCycle, 4);
+                TestUtils.Compare(voltScope[voltageHighNdx].time, quarterCycleTime, 4);
 
-				TestUtils.Compare(voltageLow, -voltage0.dutyCycle, 4);
-				TestUtils.Compare(voltScope[voltageLowNdx].time, quarterCycleTime * 3, 4);
-			}
+                double voltageLow = voltScope.Min((f) => f.voltage);
+                int voltageLowNdx = voltScope.FindIndex((f) => f.voltage == voltageLow);
 
-			// Resistor
-			{
-				double voltageHigh = resScope.Max((f) => f.voltage);
-				int voltageHighNdx = resScope.FindIndex((f) => f.voltage == voltageHigh);
+                TestUtils.Compare(voltageLow, -voltage0.dutyCycle, 4);
+                TestUtils.Compare(voltScope[voltageLowNdx].time, quarterCycleTime * 3, 4);
+            }
 
-				TestUtils.Compare(resScope[voltageHighNdx].time, quarterCycleTime, 4);
+            // Resistor
+            {
+                double voltageHigh = resScope.Max((f) => f.voltage);
+                int voltageHighNdx = resScope.FindIndex((f) => f.voltage == voltageHigh);
 
-				double voltageLow = resScope.Min((f) => f.voltage);
-				int voltageLowNdx = resScope.FindIndex((f) => f.voltage == voltageLow);
+                TestUtils.Compare(resScope[voltageHighNdx].time, quarterCycleTime, 4);
 
-				TestUtils.Compare(voltageLow, 0, 8);
-			}
+                double voltageLow = resScope.Min((f) => f.voltage);
+                int voltageLowNdx = resScope.FindIndex((f) => f.voltage == voltageLow);
 
-			/*string js = JsonSerializer.SerializeToString(sim);
+                TestUtils.Compare(voltageLow, 0, 8);
+            }
+
+            /*string js = JsonSerializer.SerializeToString(sim);
 			string nm = TestContext.CurrentContext.Test.Name;
 			Debug.Log(nm);
 			Debug.Log(js);
 			System.IO.File.WriteAllText(string.Format("./{0}.json", nm), js);*/
-		}
+        }
 
-		[Test]
-		public void FullWaveRectifierTest(){
-			Assert.Ignore("Not Implemented!");
-		}
+        [Test]
+        public void FullWaveRectifierTest()
+        {
+            Assert.Ignore("Not Implemented!");
+        }
 
-	}
+    }
 }

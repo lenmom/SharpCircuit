@@ -1,228 +1,240 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
-using SharpCircuit;
 using NUnit.Framework;
 
-namespace SharpCircuitTest {
+using SharpCircuit;
 
-	public class SimpleTest {
+namespace SharpCircuitTest
+{
 
-		//Assert.That(1.0, Is.EqualTo(1.5).Within(0.5f));
+    public class SimpleTest
+    {
 
-		[Test]
-		public void AnalogSwitchTest() {
-			Circuit sim = new Circuit();
+        //Assert.That(1.0, Is.EqualTo(1.5).Within(0.5f));
 
-			var logicIn0 = sim.Create<LogicInput>();
-			var logicIn1 = sim.Create<LogicInput>();
+        [Test]
+        public void AnalogSwitchTest()
+        {
+            Circuit sim = new Circuit();
 
-			var analogSwitch0 = sim.Create<AnalogSwitch>();
+            LogicInput logicIn0 = sim.Create<LogicInput>();
+            LogicInput logicIn1 = sim.Create<LogicInput>();
 
-			var grnd = sim.Create<Ground>();
+            AnalogSwitch analogSwitch0 = sim.Create<AnalogSwitch>();
 
-			sim.Connect(logicIn0.leadOut, analogSwitch0.leadIn);
-			sim.Connect(logicIn1.leadOut, analogSwitch0.leadSwitch);
-			sim.Connect(analogSwitch0.leadOut, grnd.leadIn);
+            Ground grnd = sim.Create<Ground>();
 
-			logicIn0.toggle();
-			logicIn1.toggle();
+            sim.Connect(logicIn0.leadOut, analogSwitch0.leadIn);
+            sim.Connect(logicIn1.leadOut, analogSwitch0.leadSwitch);
+            sim.Connect(analogSwitch0.leadOut, grnd.leadIn);
 
-			sim.doTicks(100);
-			Assert.AreEqual(0.25, Math.Round(grnd.getCurrent(), 12));
+            logicIn0.toggle();
+            logicIn1.toggle();
 
-			logicIn1.toggle();
-			sim.analyze();
-			sim.doTicks(100);
-			Assert.AreEqual(5E-10, Math.Round(grnd.getCurrent(), 12));
-		}
+            sim.doTicks(100);
+            Assert.AreEqual(0.25, Math.Round(grnd.getCurrent(), 12));
 
-		[TestCase(0.01)]
-		[TestCase(0.02)]
-		[TestCase(0.04)]
-		[TestCase(0.06)]
-		[TestCase(0.08)]
-		[TestCase(0.10)]
-		public void CurrentSourceTest(double current) {
-			Circuit sim = new Circuit();
+            logicIn1.toggle();
+            sim.analyze();
+            sim.doTicks(100);
+            Assert.AreEqual(5E-10, Math.Round(grnd.getCurrent(), 12));
+        }
 
-			var source0 = sim.Create<CurrentSource>();
-			source0.sourceCurrent = current;
-			var res0 = sim.Create<Resistor>();
+        [TestCase(0.01)]
+        [TestCase(0.02)]
+        [TestCase(0.04)]
+        [TestCase(0.06)]
+        [TestCase(0.08)]
+        [TestCase(0.10)]
+        public void CurrentSourceTest(double current)
+        {
+            Circuit sim = new Circuit();
 
-			sim.Connect(source0.leadOut, res0.leadIn);
-			sim.Connect(res0.leadOut, source0.leadIn);
+            CurrentSource source0 = sim.Create<CurrentSource>();
+            source0.sourceCurrent = current;
+            Resistor res0 = sim.Create<Resistor>();
 
-			var source1 = sim.Create<CurrentSource>();
-			source1.sourceCurrent = current;
-			var res1 = sim.Create<Resistor>();
+            sim.Connect(source0.leadOut, res0.leadIn);
+            sim.Connect(res0.leadOut, source0.leadIn);
 
-			sim.Connect(source1.leadOut, res1.leadOut);
-			sim.Connect(res1.leadIn, source1.leadIn);
+            CurrentSource source1 = sim.Create<CurrentSource>();
+            source1.sourceCurrent = current;
+            Resistor res1 = sim.Create<Resistor>();
 
-			sim.doTicks(100);
+            sim.Connect(source1.leadOut, res1.leadOut);
+            sim.Connect(res1.leadIn, source1.leadIn);
 
-			Assert.AreEqual(current, res0.getCurrent());
-			Assert.AreEqual(-current, res1.getCurrent());
-			Assert.AreEqual(current * res0.resistance, res0.getVoltageDelta());
-		}
+            sim.doTicks(100);
 
-		[TestCase( 20)]
-		[TestCase( 40)]
-		[TestCase( 60)]
-		[TestCase( 80)]
-		[TestCase(100)]
-		[TestCase(120)]
-		[TestCase(140)]
-		[TestCase(160)]
-		[TestCase(180)]
-		public void ResistorTest(double resistance) {
-			Circuit sim = new Circuit();
+            Assert.AreEqual(current, res0.getCurrent());
+            Assert.AreEqual(-current, res1.getCurrent());
+            Assert.AreEqual(current * res0.resistance, res0.getVoltageDelta());
+        }
 
-			var volt0 = sim.Create<DCVoltageSource>();
-			var res0 = sim.Create<Resistor>();
-			
-			sim.Connect(volt0.leadPos, res0.leadOut);
-			sim.Connect(res0.leadIn, volt0.leadNeg);
+        [TestCase(20)]
+        [TestCase(40)]
+        [TestCase(60)]
+        [TestCase(80)]
+        [TestCase(100)]
+        [TestCase(120)]
+        [TestCase(140)]
+        [TestCase(160)]
+        [TestCase(180)]
+        public void ResistorTest(double resistance)
+        {
+            Circuit sim = new Circuit();
 
-			for(int x = 1; x <= 100; x++) {
-				sim.doTick();
-				// Ohm's Law
-				Assert.AreEqual(res0.getVoltageDelta(), res0.resistance * res0.getCurrent()); // V = I x R
-				Assert.AreEqual(res0.getCurrent(), res0.getVoltageDelta() / res0.resistance); // I = V / R
-				Assert.AreEqual(res0.resistance, res0.getVoltageDelta() / res0.getCurrent()); // R = V / I
-			}
-		}
+            DCVoltageSource volt0 = sim.Create<DCVoltageSource>();
+            Resistor res0 = sim.Create<Resistor>();
 
-		[TestCase( 20)]
-		[TestCase( 40)]
-		[TestCase( 60)]
-		[TestCase( 80)]
-		[TestCase(100)]
-		[TestCase(120)]
-		[TestCase(140)]
-		[TestCase(160)]
-		[TestCase(180)]
-		public void LinearResistorTest(double resistance) {
-			Circuit sim = new Circuit();
+            sim.Connect(volt0.leadPos, res0.leadOut);
+            sim.Connect(res0.leadIn, volt0.leadNeg);
 
-			var volt0 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
-			var res0 = sim.Create<Resistor>();
-			var ground0 = sim.Create<Ground>();
+            for (int x = 1; x <= 100; x++)
+            {
+                sim.doTick();
+                // Ohm's Law
+                Assert.AreEqual(res0.getVoltageDelta(), res0.resistance * res0.getCurrent()); // V = I x R
+                Assert.AreEqual(res0.getCurrent(), res0.getVoltageDelta() / res0.resistance); // I = V / R
+                Assert.AreEqual(res0.resistance, res0.getVoltageDelta() / res0.getCurrent()); // R = V / I
+            }
+        }
 
-			sim.Connect(volt0.leadPos, res0.leadIn);
-			sim.Connect(res0.leadOut, ground0.leadIn);
+        [TestCase(20)]
+        [TestCase(40)]
+        [TestCase(60)]
+        [TestCase(80)]
+        [TestCase(100)]
+        [TestCase(120)]
+        [TestCase(140)]
+        [TestCase(160)]
+        [TestCase(180)]
+        public void LinearResistorTest(double resistance)
+        {
+            Circuit sim = new Circuit();
 
-			for(int x = 1; x <= 100; x++) {
-				sim.doTick();
-				// Ohm's Law
-				Assert.AreEqual(res0.getVoltageDelta(), res0.resistance * res0.getCurrent()); // V = I x R
-				Assert.AreEqual(res0.getCurrent(), res0.getVoltageDelta() / res0.resistance); // I = V / R
-				Assert.AreEqual(res0.resistance, res0.getVoltageDelta() / res0.getCurrent()); // R = V / I
-			}
-		}
+            VoltageInput volt0 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
+            Resistor res0 = sim.Create<Resistor>();
+            Ground ground0 = sim.Create<Ground>();
 
-		[TestCase(1)]
-		[TestCase(0.02)]
-		[TestCase(0.4)]
-		public void InductorTest(double inductance) {
-			Circuit sim = new Circuit();
+            sim.Connect(volt0.leadPos, res0.leadIn);
+            sim.Connect(res0.leadOut, ground0.leadIn);
 
-			var source0 = sim.Create<DCVoltageSource>();
-			var inductor0 = sim.Create<InductorElm>(inductance);
+            for (int x = 1; x <= 100; x++)
+            {
+                sim.doTick();
+                // Ohm's Law
+                Assert.AreEqual(res0.getVoltageDelta(), res0.resistance * res0.getCurrent()); // V = I x R
+                Assert.AreEqual(res0.getCurrent(), res0.getVoltageDelta() / res0.resistance); // I = V / R
+                Assert.AreEqual(res0.resistance, res0.getVoltageDelta() / res0.getCurrent()); // R = V / I
+            }
+        }
 
-			sim.Connect(source0.leadPos, inductor0.leadIn);
-			sim.Connect(inductor0.leadOut, source0.leadNeg);
+        [TestCase(1)]
+        [TestCase(0.02)]
+        [TestCase(0.4)]
+        public void InductorTest(double inductance)
+        {
+            Circuit sim = new Circuit();
 
-			double cycleTime = 1 / source0.frequency;
-			double quarterCycleTime = cycleTime / 4;
+            DCVoltageSource source0 = sim.Create<DCVoltageSource>();
+            InductorElm inductor0 = sim.Create<InductorElm>(inductance);
 
-			sim.doTicks((int)(cycleTime / sim.timeStep));
+            sim.Connect(source0.leadPos, inductor0.leadIn);
+            sim.Connect(inductor0.leadOut, source0.leadNeg);
 
-			double flux = inductor0.inductance * inductor0.getCurrent();	// F = I x L
-			Assert.AreEqual(inductor0.getCurrent(), flux / inductor0.inductance); // I = F / L
-			Assert.AreEqual(inductor0.inductance, flux / inductor0.getCurrent()); // L = F / I
-		}
+            double cycleTime = 1 / source0.frequency;
+            double quarterCycleTime = cycleTime / 4;
 
-		[TestCase(1   )]
-		[TestCase(0.02)]
-		[TestCase(0.4 )]
-		public void LinearInductorTest(double inductance) {
-			Circuit sim = new Circuit();
+            sim.doTicks((int)(cycleTime / sim.timeStep));
 
-			var source0 = sim.Create<VoltageInput>(Voltage.WaveType.AC);
-			var inductor0 = sim.Create<InductorElm>(inductance);
-			var out0 = sim.Create<Ground>();
+            double flux = inductor0.inductance * inductor0.getCurrent();    // F = I x L
+            Assert.AreEqual(inductor0.getCurrent(), flux / inductor0.inductance); // I = F / L
+            Assert.AreEqual(inductor0.inductance, flux / inductor0.getCurrent()); // L = F / I
+        }
 
-			sim.Connect(source0.leadPos, inductor0.leadIn);
-			sim.Connect(inductor0.leadOut, out0.leadIn);
+        [TestCase(1)]
+        [TestCase(0.02)]
+        [TestCase(0.4)]
+        public void LinearInductorTest(double inductance)
+        {
+            Circuit sim = new Circuit();
 
-			double cycleTime = 1 / source0.frequency;
-			double quarterCycleTime = cycleTime / 4;
+            VoltageInput source0 = sim.Create<VoltageInput>(Voltage.WaveType.AC);
+            InductorElm inductor0 = sim.Create<InductorElm>(inductance);
+            Ground out0 = sim.Create<Ground>();
 
-			sim.doTicks((int)(cycleTime / sim.timeStep));
+            sim.Connect(source0.leadPos, inductor0.leadIn);
+            sim.Connect(inductor0.leadOut, out0.leadIn);
 
-			Debug.Log(inductor0.getCurrent());
-			Assert.Ignore();
-		}
+            double cycleTime = 1 / source0.frequency;
+            double quarterCycleTime = cycleTime / 4;
 
-		[TestCase(true )]
-		[TestCase(false)]
-		public void SwitchSPSTTest(bool in0) {
-			Circuit sim = new Circuit();
+            sim.doTicks((int)(cycleTime / sim.timeStep));
 
-			var volt0 = sim.Create<VoltageInput>();
-			var switch0 = sim.Create<SwitchSPST>();
-			var res0 = sim.Create<Resistor>();
-			var logicOut0 = sim.Create<LogicOutput>();
+            Debug.Log(inductor0.getCurrent());
+            Assert.Ignore();
+        }
 
-			sim.Connect(volt0, 0, switch0, 0);
-			sim.Connect(switch0, 1, res0, 0);
-			sim.Connect(res0, 1, logicOut0, 0);
+        [TestCase(true)]
+        [TestCase(false)]
+        public void SwitchSPSTTest(bool in0)
+        {
+            Circuit sim = new Circuit();
 
-			var volt1 = sim.Create<VoltageInput>();
-			var switch1 = sim.Create<SwitchSPST>();
-			var res1 = sim.Create<Resistor>();
-			var grnd1 = sim.Create<Ground>();
+            VoltageInput volt0 = sim.Create<VoltageInput>();
+            SwitchSPST switch0 = sim.Create<SwitchSPST>();
+            Resistor res0 = sim.Create<Resistor>();
+            LogicOutput logicOut0 = sim.Create<LogicOutput>();
 
-			sim.Connect(volt1, 0, switch1, 0);
-			sim.Connect(switch1, 1, res1, 0);
-			sim.Connect(res1, 1, grnd1, 0);
+            sim.Connect(volt0, 0, switch0, 0);
+            sim.Connect(switch0, 1, res0, 0);
+            sim.Connect(res0, 1, logicOut0, 0);
 
-			if(in0) {
-				switch0.toggle();
-				switch1.toggle();
-			}
+            VoltageInput volt1 = sim.Create<VoltageInput>();
+            SwitchSPST switch1 = sim.Create<SwitchSPST>();
+            Resistor res1 = sim.Create<Resistor>();
+            Ground grnd1 = sim.Create<Ground>();
 
-			sim.doTicks(100);
+            sim.Connect(volt1, 0, switch1, 0);
+            sim.Connect(switch1, 1, res1, 0);
+            sim.Connect(res1, 1, grnd1, 0);
 
-			Debug.Log(logicOut0.getVoltageDelta(), logicOut0.getCurrent());
-			Debug.Log(grnd1.getVoltageDelta(), grnd1.getCurrent());
-			Assert.Ignore();
-		}
+            if (in0)
+            {
+                switch0.toggle();
+                switch1.toggle();
+            }
 
-		[TestCase(1, false)]
-		[TestCase(0, true )]
-		public void InverterTest(int in0, bool out0) {
-			Circuit sim = new Circuit();
+            sim.doTicks(100);
 
-			var logicIn0 = sim.Create<LogicInput>();
-			var invert0 = sim.Create<Inverter>();
-			var logicOut = sim.Create<LogicOutput>();
+            Debug.Log(logicOut0.getVoltageDelta(), logicOut0.getCurrent());
+            Debug.Log(grnd1.getVoltageDelta(), grnd1.getCurrent());
+            Assert.Ignore();
+        }
 
-			sim.Connect(logicIn0.leadOut, invert0.leadIn);
-			sim.Connect(invert0.leadOut, logicOut.leadIn);
+        [TestCase(1, false)]
+        [TestCase(0, true)]
+        public void InverterTest(int in0, bool out0)
+        {
+            Circuit sim = new Circuit();
 
-			logicIn0.setPosition(in0);
-			sim.analyze();
+            LogicInput logicIn0 = sim.Create<LogicInput>();
+            Inverter invert0 = sim.Create<Inverter>();
+            LogicOutput logicOut = sim.Create<LogicOutput>();
 
-			sim.doTicks(100);
+            sim.Connect(logicIn0.leadOut, invert0.leadIn);
+            sim.Connect(invert0.leadOut, logicOut.leadIn);
 
-			Assert.AreEqual(out0, logicOut.isHigh());
-		}
+            logicIn0.setPosition(in0);
+            sim.analyze();
 
-		/*[TestCase(true)]
+            sim.doTicks(100);
+
+            Assert.AreEqual(out0, logicOut.isHigh());
+        }
+
+        /*[TestCase(true)]
 		[TestCase(false)]
 		public void LogicInputOutputTest(bool in0) {
 			Circuit sim = new Circuit();
@@ -233,111 +245,116 @@ namespace SharpCircuitTest {
 			Assert.Ignore();
 		}*/
 
-		[TestCase(0.005)]
-		[TestCase(0.200)]
-		[TestCase(0.400)]
-		[TestCase(0.5  )]
-		[TestCase(0.600)]
-		[TestCase(0.800)]
-		[TestCase(0.995)]
-		public void PotentiometerTest(double in0) {
-			Circuit sim = new Circuit();
+        [TestCase(0.005)]
+        [TestCase(0.200)]
+        [TestCase(0.400)]
+        [TestCase(0.5)]
+        [TestCase(0.600)]
+        [TestCase(0.800)]
+        [TestCase(0.995)]
+        public void PotentiometerTest(double in0)
+        {
+            Circuit sim = new Circuit();
 
-			var volt0 = sim.Create<LogicInput>();
-			volt0.toggle();
+            LogicInput volt0 = sim.Create<LogicInput>();
+            volt0.toggle();
 
-			var potent0 = sim.Create<Potentiometer>();
-			potent0.position = in0; // 0.995
+            Potentiometer potent0 = sim.Create<Potentiometer>();
+            potent0.position = in0; // 0.995
 
-			var grnd0 = sim.Create<Ground>();
-			var grnd1 = sim.Create<Ground>();
+            Ground grnd0 = sim.Create<Ground>();
+            Ground grnd1 = sim.Create<Ground>();
 
-			sim.Connect(potent0.leadVoltage, volt0.leadOut);
-			sim.Connect(potent0.leadIn, grnd0.leadIn);
-			sim.Connect(potent0.leadOut, grnd1.leadIn);
+            sim.Connect(potent0.leadVoltage, volt0.leadOut);
+            sim.Connect(potent0.leadIn, grnd0.leadIn);
+            sim.Connect(potent0.leadOut, grnd1.leadIn);
 
-			sim.doTicks(100);
+            sim.doTicks(100);
 
-			Debug.Log("grnd0",  grnd0.getCurrent());
-			Debug.Log("grnd1", grnd1.getCurrent());
-			Debug.Log(grnd0.getCurrent() + grnd1.getCurrent());
-			Assert.Ignore();
-		}
+            Debug.Log("grnd0", grnd0.getCurrent());
+            Debug.Log("grnd1", grnd1.getCurrent());
+            Debug.Log(grnd0.getCurrent() + grnd1.getCurrent());
+            Assert.Ignore();
+        }
 
-		[Test]
-		public void SiliconRectifierTest() {
-			Circuit sim = new Circuit();
+        [Test]
+        public void SiliconRectifierTest()
+        {
+            Circuit sim = new Circuit();
 
-			var volt0 = sim.Create<VoltageInput>();
-			var volt1 = sim.Create<VoltageInput>();
+            VoltageInput volt0 = sim.Create<VoltageInput>();
+            VoltageInput volt1 = sim.Create<VoltageInput>();
 
-			var res0 = sim.Create<Resistor>();
-			
-			var scr0 = sim.Create<SiliconRectifier>();
+            Resistor res0 = sim.Create<Resistor>();
 
-			var grnd0 = sim.Create<Ground>();
+            SiliconRectifier scr0 = sim.Create<SiliconRectifier>();
 
-			sim.Connect(volt0.leadPos, scr0.leadIn);
+            Ground grnd0 = sim.Create<Ground>();
 
-			sim.Connect(volt1.leadPos, res0.leadIn);
-			sim.Connect(res0.leadOut, scr0.leadGate);
-			sim.Connect(scr0.leadOut, grnd0.leadIn);
+            sim.Connect(volt0.leadPos, scr0.leadIn);
 
-			sim.doTicks(1000);
+            sim.Connect(volt1.leadPos, res0.leadIn);
+            sim.Connect(res0.leadOut, scr0.leadGate);
+            sim.Connect(scr0.leadOut, grnd0.leadIn);
 
-			Debug.Log(sim.time);
-			Debug.Log("in", scr0.getLeadVoltage(0));
-			Debug.Log("out", scr0.getLeadVoltage(1));
-			Debug.Log("gate", scr0.getLeadVoltage(2));
+            sim.doTicks(1000);
 
-			Debug.Log();
-			foreach(string s in scr0.getInfo()) {
-				Debug.Log(s);
-			}
+            Debug.Log(sim.time);
+            Debug.Log("in", scr0.getLeadVoltage(0));
+            Debug.Log("out", scr0.getLeadVoltage(1));
+            Debug.Log("gate", scr0.getLeadVoltage(2));
 
-			Assert.Ignore();
-		}
+            Debug.Log();
+            foreach (string s in scr0.getInfo())
+            {
+                Debug.Log(s);
+            }
 
-		[Test]
-		public void TriodeTest() {
-			Circuit sim = new Circuit();
+            Assert.Ignore();
+        }
 
-			var volt0 = sim.Create<VoltageInput>();
-			volt0.maxVoltage = 500;
-			var triode0 = sim.Create<Triode>();
-			var grnd0 = sim.Create<Ground>();
+        [Test]
+        public void TriodeTest()
+        {
+            Circuit sim = new Circuit();
 
-			sim.Connect(volt0.leadPos, triode0.leadPlate);
-			sim.Connect(triode0.leadCath, grnd0.leadIn);
+            VoltageInput volt0 = sim.Create<VoltageInput>();
+            volt0.maxVoltage = 500;
+            Triode triode0 = sim.Create<Triode>();
+            Ground grnd0 = sim.Create<Ground>();
 
-			sim.doTicks(100);
+            sim.Connect(volt0.leadPos, triode0.leadPlate);
+            sim.Connect(triode0.leadCath, grnd0.leadIn);
 
-			Assert.AreEqual(0.018332499042, Math.Round(volt0.getCurrent(), 12));
-		}
+            sim.doTicks(100);
 
-		[TestCase(0, 0, false)]
-		[TestCase(1, 0, false)]
-		[TestCase(0, 1, false)]
-		[TestCase(1, 1, true )]
-		public void TriStateBufferTest(int in0, int in1, bool in3) {
-			Circuit sim = new Circuit();
+            Assert.AreEqual(0.018332499042, Math.Round(volt0.getCurrent(), 12));
+        }
 
-			var logicIn0 = sim.Create<LogicInput>();
-			var logicIn1 = sim.Create<LogicInput>();
-			var logicOut0 = sim.Create<LogicOutput>();
-			var tri0 = sim.Create<TriStateBuffer>();
+        [TestCase(0, 0, false)]
+        [TestCase(1, 0, false)]
+        [TestCase(0, 1, false)]
+        [TestCase(1, 1, true)]
+        public void TriStateBufferTest(int in0, int in1, bool in3)
+        {
+            Circuit sim = new Circuit();
 
-			sim.Connect(logicIn0.leadOut, tri0.leadIn);
-			sim.Connect(logicIn1.leadOut, tri0.leadGate);
-			sim.Connect(logicOut0.leadIn, tri0.leadOut);
+            LogicInput logicIn0 = sim.Create<LogicInput>();
+            LogicInput logicIn1 = sim.Create<LogicInput>();
+            LogicOutput logicOut0 = sim.Create<LogicOutput>();
+            TriStateBuffer tri0 = sim.Create<TriStateBuffer>();
 
-			logicIn0.setPosition(in0);
-			logicIn1.setPosition(in1);
+            sim.Connect(logicIn0.leadOut, tri0.leadIn);
+            sim.Connect(logicIn1.leadOut, tri0.leadGate);
+            sim.Connect(logicOut0.leadIn, tri0.leadOut);
 
-			sim.doTicks(100);
+            logicIn0.setPosition(in0);
+            logicIn1.setPosition(in1);
 
-			Assert.AreEqual(in3, logicOut0.isHigh());
-		}
+            sim.doTicks(100);
 
-	}
+            Assert.AreEqual(in3, logicOut0.isHigh());
+        }
+
+    }
 }

@@ -1,31 +1,32 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+namespace SharpCircuit
+{
 
-namespace SharpCircuit {
+    public class SevenSegElm : Chip
+    {
 
-	public class SevenSegElm : Chip {
-		
-		public SevenSegElm() : base() {
+        public SevenSegElm() : base()
+        {
 
-		}
+        }
 
-		public override String getChipName() {
-			return "7-segment driver/display";
-		}
+        public override string getChipName()
+        {
+            return "7-segment driver/display";
+        }
 
-		public override void setupPins() {
-			pins = new Pin[7];
-			pins[0] = new Pin("a");
-			pins[1] = new Pin("b");
-			pins[2] = new Pin("c");
-			pins[3] = new Pin("d");
-			pins[4] = new Pin("e");
-			pins[5] = new Pin("f");
-			pins[6] = new Pin("g");
-		}
+        public override void setupPins()
+        {
+            pins = new Pin[7];
+            pins[0] = new Pin("a");
+            pins[1] = new Pin("b");
+            pins[2] = new Pin("c");
+            pins[3] = new Pin("d");
+            pins[4] = new Pin("e");
+            pins[5] = new Pin("f");
+            pins[6] = new Pin("g");
+        }
 
-		/*void draw(Graphics g) {
+        /*void draw(Graphics g) {
 			drawChip(g);
 			g.setColor(Color.red);
 			int xl = x + cspc * 5;
@@ -51,13 +52,15 @@ namespace SharpCircuit {
 					.getState() ? Color.white : darkred);
 		}*/
 
-		public override int getLeadCount() {
-			return 7;
-		}
+        public override int getLeadCount()
+        {
+            return 7;
+        }
 
-		public override int getVoltageSourceCount() {
-			return 0;
-		}
+        public override int getVoltageSourceCount()
+        {
+            return 0;
+        }
 
-	}
+    }
 }

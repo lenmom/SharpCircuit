@@ -2,226 +2,250 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using SharpCircuit;
 using NUnit.Framework;
 
-namespace SharpCircuitTest {
+using SharpCircuit;
 
-	[TestFixture]
-	public class MosfetTest {
+namespace SharpCircuitTest
+{
 
-		[Test]
-		public void NMosfetTest() {
-			Circuit sim = new Circuit();
+    [TestFixture]
+    public class MosfetTest
+    {
 
-			var volt0 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
-			volt0.maxVoltage = 3.5;
+        [Test]
+        public void NMosfetTest()
+        {
+            Circuit sim = new Circuit();
 
-			var volt1 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
-			volt1.maxVoltage = 5;
+            VoltageInput volt0 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
+            volt0.maxVoltage = 3.5;
 
-			var nmosf0 = sim.Create<NMosfet>();
+            VoltageInput volt1 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
+            volt1.maxVoltage = 5;
 
-			var grnd0 = sim.Create<Ground>();
+            NMosfet nmosf0 = sim.Create<NMosfet>();
 
-			sim.Connect(volt0.leadPos, nmosf0.leadGate);
-			sim.Connect(volt1.leadPos, nmosf0.leadDrain);
-			sim.Connect(grnd0.leadIn, nmosf0.leadSrc);
+            Ground grnd0 = sim.Create<Ground>();
 
-			sim.doTicks(100);
+            sim.Connect(volt0.leadPos, nmosf0.leadGate);
+            sim.Connect(volt1.leadPos, nmosf0.leadDrain);
+            sim.Connect(grnd0.leadIn, nmosf0.leadSrc);
 
-			Debug.Log("n-Vds", nmosf0.getVoltageDelta(), nmosf0.getState());
-			Assert.AreEqual(0.04, Math.Round(volt1.getCurrent(), 6));
-		}
+            sim.doTicks(100);
 
-		[TestCase(1.5, 1.4, true )]
-		[TestCase(1.5, 1.6, false)]
-		public void NMosfetTheshholdTest(double in0, double in1, bool in2) {
-			Circuit sim = new Circuit();
+            Debug.Log("n-Vds", nmosf0.getVoltageDelta(), nmosf0.getState());
+            Assert.AreEqual(0.04, Math.Round(volt1.getCurrent(), 6));
+        }
 
-			var nmosf0 = sim.Create<NMosfet>();
-			nmosf0.threshold = in0;
+        [TestCase(1.5, 1.4, true)]
+        [TestCase(1.5, 1.6, false)]
+        public void NMosfetTheshholdTest(double in0, double in1, bool in2)
+        {
+            Circuit sim = new Circuit();
 
-			var volt0 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
-			volt0.maxVoltage = in1;
+            NMosfet nmosf0 = sim.Create<NMosfet>();
+            nmosf0.threshold = in0;
 
-			var volt1 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
-			volt1.maxVoltage = 5;
+            VoltageInput volt0 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
+            volt0.maxVoltage = in1;
 
-			var grnd0 = sim.Create<Ground>();
+            VoltageInput volt1 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
+            volt1.maxVoltage = 5;
 
-			sim.Connect(volt0.leadPos, nmosf0.leadGate);
-			sim.Connect(volt1.leadPos, nmosf0.leadDrain);
-			sim.Connect(grnd0.leadIn, nmosf0.leadSrc);
+            Ground grnd0 = sim.Create<Ground>();
 
-			sim.doTicks(100);
+            sim.Connect(volt0.leadPos, nmosf0.leadGate);
+            sim.Connect(volt1.leadPos, nmosf0.leadDrain);
+            sim.Connect(grnd0.leadIn, nmosf0.leadSrc);
 
-			double i = Math.Round(nmosf0.getCurrent(), 6);
-			Assert.AreEqual(i == 0, in2);
-			
-		}
+            sim.doTicks(100);
 
-		[Test]
-		public void PMosfetTest() {
-			Circuit sim = new Circuit();
+            double i = Math.Round(nmosf0.getCurrent(), 6);
+            Assert.AreEqual(i == 0, in2);
 
-			var volt0 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
-			volt0.maxVoltage = 2.5;
+        }
 
-			var volt1 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
-			volt1.maxVoltage = 5;
+        [Test]
+        public void PMosfetTest()
+        {
+            Circuit sim = new Circuit();
 
-			var volt2 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
-			volt2.maxVoltage = 3;
+            VoltageInput volt0 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
+            volt0.maxVoltage = 2.5;
 
-			var pmosf0 = sim.Create<PMosfet>();
+            VoltageInput volt1 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
+            volt1.maxVoltage = 5;
 
-			sim.Connect(volt0.leadPos, pmosf0.leadGate);
-			sim.Connect(volt1.leadPos, pmosf0.leadSrc);
-			sim.Connect(volt2.leadPos, pmosf0.leadDrain);
+            VoltageInput volt2 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
+            volt2.maxVoltage = 3;
 
-			sim.doTicks(100);
+            PMosfet pmosf0 = sim.Create<PMosfet>();
 
-			Debug.Log("p-Vsd", pmosf0.getVoltageDelta(), pmosf0.getState());
-			Assert.AreEqual(0.01, Math.Round(volt1.getCurrent(), 6));
-		}
+            sim.Connect(volt0.leadPos, pmosf0.leadGate);
+            sim.Connect(volt1.leadPos, pmosf0.leadSrc);
+            sim.Connect(volt2.leadPos, pmosf0.leadDrain);
 
-		[TestCase(true,  5E-08)]
-		[TestCase(false, 0.01588403349)]
-		public void SwitchTest(bool in0, double out0) {
-			Circuit sim = new Circuit();
+            sim.doTicks(100);
 
-			var volt0 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
-			var switch0 = sim.Create<SwitchSPST>();
-			var res0 = sim.Create<Resistor>(300);
-			var nmosf0 = sim.Create<NMosfet>();
-			var grnd0 = sim.Create<Ground>();
+            Debug.Log("p-Vsd", pmosf0.getVoltageDelta(), pmosf0.getState());
+            Assert.AreEqual(0.01, Math.Round(volt1.getCurrent(), 6));
+        }
 
-			sim.Connect(volt0, 0, switch0, 0);
-			sim.Connect(volt0, 0, res0, 0);
-			sim.Connect(nmosf0, 0, switch0, 1);
-			sim.Connect(nmosf0.leadDrain, res0.leadOut);
-			sim.Connect(nmosf0.leadSrc, grnd0.leadIn);
+        [TestCase(true, 5E-08)]
+        [TestCase(false, 0.01588403349)]
+        public void SwitchTest(bool in0, double out0)
+        {
+            Circuit sim = new Circuit();
 
-			if(in0) switch0.toggle();
+            VoltageInput volt0 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
+            SwitchSPST switch0 = sim.Create<SwitchSPST>();
+            Resistor res0 = sim.Create<Resistor>(300);
+            NMosfet nmosf0 = sim.Create<NMosfet>();
+            Ground grnd0 = sim.Create<Ground>();
 
-			sim.doTicks(100);
+            sim.Connect(volt0, 0, switch0, 0);
+            sim.Connect(volt0, 0, res0, 0);
+            sim.Connect(nmosf0, 0, switch0, 1);
+            sim.Connect(nmosf0.leadDrain, res0.leadOut);
+            sim.Connect(nmosf0.leadSrc, grnd0.leadIn);
 
-			Assert.AreEqual(out0, Math.Round(grnd0.getCurrent(), 12));
-		}
+            if (in0)
+            {
+                switch0.toggle();
+            }
 
-		//SourceFollowerTest
-		//CurrentSourceTest
-		//CurrentRampTest
-		//CurrentMirrorTest
-		//CommonSourceAmplifierTest
+            sim.doTicks(100);
 
-		[TestCase(true,  false)]
-		[TestCase(false, true)]
-		public void CMOSInverterTest(bool in0, bool out0) {
-			Circuit sim = new Circuit();
+            Assert.AreEqual(out0, Math.Round(grnd0.getCurrent(), 12));
+        }
 
-			var logicIn0 = sim.Create<LogicInput>();
-			var logicOut0 = sim.Create<LogicOutput>();
+        //SourceFollowerTest
+        //CurrentSourceTest
+        //CurrentRampTest
+        //CurrentMirrorTest
+        //CommonSourceAmplifierTest
 
-			var volt0 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
-			var grnd0 = sim.Create<Ground>();
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        public void CMOSInverterTest(bool in0, bool out0)
+        {
+            Circuit sim = new Circuit();
 
-			var pmosf0 = sim.Create<PMosfet>();
-			var nmosf0 = sim.Create<NMosfet>();
+            LogicInput logicIn0 = sim.Create<LogicInput>();
+            LogicOutput logicOut0 = sim.Create<LogicOutput>();
 
-			sim.Connect(logicIn0.leadOut, pmosf0.leadGate);
-			sim.Connect(logicIn0.leadOut, nmosf0.leadGate);
+            VoltageInput volt0 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
+            Ground grnd0 = sim.Create<Ground>();
 
-			sim.Connect(pmosf0.leadSrc, volt0.leadPos);
-			sim.Connect(pmosf0.leadDrain, nmosf0.leadDrain);
-			sim.Connect(nmosf0.leadSrc, grnd0.leadIn);
+            PMosfet pmosf0 = sim.Create<PMosfet>();
+            NMosfet nmosf0 = sim.Create<NMosfet>();
 
-			sim.Connect(logicOut0.leadIn, pmosf0.leadDrain);
+            sim.Connect(logicIn0.leadOut, pmosf0.leadGate);
+            sim.Connect(logicIn0.leadOut, nmosf0.leadGate);
 
-			if(in0) logicIn0.toggle();
+            sim.Connect(pmosf0.leadSrc, volt0.leadPos);
+            sim.Connect(pmosf0.leadDrain, nmosf0.leadDrain);
+            sim.Connect(nmosf0.leadSrc, grnd0.leadIn);
 
-			sim.doTicks(1000);
+            sim.Connect(logicOut0.leadIn, pmosf0.leadDrain);
 
-			Assert.AreEqual(out0, logicOut0.isHigh());
-		}
+            if (in0)
+            {
+                logicIn0.toggle();
+            }
 
-		[Test]
-		public void CMOSInverterCapacitanceTest() {
-			Assert.Ignore();
-		}
+            sim.doTicks(1000);
 
-		[Test]
-		public void CMOSInverterTransitionTest() {
-			Assert.Ignore();
-		}
+            Assert.AreEqual(out0, logicOut0.isHigh());
+        }
 
-		[TestCase(true,  4.316625)]
-		[TestCase(false, 1E-05)]
-		public void CMOSTransmissionGateTest(bool in0, double out0) {
-			Circuit sim = new Circuit();
+        [Test]
+        public void CMOSInverterCapacitanceTest()
+        {
+            Assert.Ignore();
+        }
 
-			var volt0 = sim.Create<VoltageInput>(Voltage.WaveType.AC);
-			volt0.maxVoltage = 2.5;
-			volt0.bias = 2.5;
+        [Test]
+        public void CMOSInverterTransitionTest()
+        {
+            Assert.Ignore();
+        }
 
-			var logicIn0 = sim.Create<LogicInput>();
-			var invert0 = sim.Create<Inverter>();
+        [TestCase(true, 4.316625)]
+        [TestCase(false, 1E-05)]
+        public void CMOSTransmissionGateTest(bool in0, double out0)
+        {
+            Circuit sim = new Circuit();
 
-			var pmosf0 = sim.Create<PMosfet>();
-			var nmosf0 = sim.Create<NMosfet>();
+            VoltageInput volt0 = sim.Create<VoltageInput>(Voltage.WaveType.AC);
+            volt0.maxVoltage = 2.5;
+            volt0.bias = 2.5;
 
-			var res0 = sim.Create<Resistor>();
-			var grnd0 = sim.Create<Ground>();
+            LogicInput logicIn0 = sim.Create<LogicInput>();
+            Inverter invert0 = sim.Create<Inverter>();
 
-			sim.Connect(volt0.leadPos, pmosf0.leadDrain);
+            PMosfet pmosf0 = sim.Create<PMosfet>();
+            NMosfet nmosf0 = sim.Create<NMosfet>();
 
-			sim.Connect(pmosf0.leadDrain, nmosf0.leadSrc);
-			sim.Connect(pmosf0.leadSrc, nmosf0.leadDrain);
+            Resistor res0 = sim.Create<Resistor>();
+            Ground grnd0 = sim.Create<Ground>();
 
-			sim.Connect(logicIn0.leadOut, invert0.leadIn);
-			sim.Connect(invert0.leadOut, pmosf0.leadGate);
-			sim.Connect(logicIn0.leadOut, nmosf0.leadGate);
+            sim.Connect(volt0.leadPos, pmosf0.leadDrain);
 
-			sim.Connect(pmosf0.leadSrc, res0.leadIn);
-			sim.Connect(res0.leadOut, grnd0.leadIn);
+            sim.Connect(pmosf0.leadDrain, nmosf0.leadSrc);
+            sim.Connect(pmosf0.leadSrc, nmosf0.leadDrain);
 
-			var res0Scope = sim.Watch(res0);
+            sim.Connect(logicIn0.leadOut, invert0.leadIn);
+            sim.Connect(invert0.leadOut, pmosf0.leadGate);
+            sim.Connect(logicIn0.leadOut, nmosf0.leadGate);
 
-			if(in0) logicIn0.toggle();
+            sim.Connect(pmosf0.leadSrc, res0.leadIn);
+            sim.Connect(res0.leadOut, grnd0.leadIn);
 
-			double cycleTime = 1 / volt0.frequency;
-			double quarterCycleTime = cycleTime / 4;
-			int steps = (int)(cycleTime / sim.timeStep);
-			sim.doTicks(steps);
+            List<ScopeFrame> res0Scope = sim.Watch(res0);
 
-			Assert.AreEqual(out0, Math.Round(res0Scope.Max((e) => e.voltage), 6));
-		}
+            if (in0)
+            {
+                logicIn0.toggle();
+            }
 
-		[Test]
-		public void CMOSMultiplexerTest() {
-			Assert.Ignore();
-		}
+            double cycleTime = 1 / volt0.frequency;
+            double quarterCycleTime = cycleTime / 4;
+            int steps = (int)(cycleTime / sim.timeStep);
+            sim.doTicks(steps);
 
-		[Test]
-		public void SampleAndHoldTest() {
-			Assert.Ignore();
-		}
+            Assert.AreEqual(out0, Math.Round(res0Scope.Max((e) => e.voltage), 6));
+        }
 
-		//DelayedBufferTest
+        [Test]
+        public void CMOSMultiplexerTest()
+        {
+            Assert.Ignore();
+        }
 
-		[Test]
-		public void LeadingEdgeDetectorTest(){
-			Assert.Ignore();
-		}
+        [Test]
+        public void SampleAndHoldTest()
+        {
+            Assert.Ignore();
+        }
 
-		[Test]
-		public void SwitchableFilterTest() {
-			Assert.Ignore();
-		}
+        //DelayedBufferTest
 
-		//Voltage Inverter
-		//Inverter Amplifier
-		//Inverter Oscillator
-	}
+        [Test]
+        public void LeadingEdgeDetectorTest()
+        {
+            Assert.Ignore();
+        }
+
+        [Test]
+        public void SwitchableFilterTest()
+        {
+            Assert.Ignore();
+        }
+
+        //Voltage Inverter
+        //Inverter Amplifier
+        //Inverter Oscillator
+    }
 }

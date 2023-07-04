@@ -2,157 +2,173 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using SharpCircuit;
-using ServiceStack.Text;
 using NUnit.Framework;
 
-namespace SharpCircuitTest {
+using SharpCircuit;
 
-	[TestFixture]
-	public class ResistorTest {
+namespace SharpCircuitTest
+{
 
-		[Test]
-		public void LeastResistanceTest() {
-			Circuit sim = new Circuit();
+    [TestFixture]
+    public class ResistorTest
+    {
 
-			var volt0 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
-			var res0 = sim.Create<Resistor>( 100);
-			var res1 = sim.Create<Resistor>(1000);
-			var ground0 = sim.Create<Ground>();
-			var ground1 = sim.Create<Ground>();
+        [Test]
+        public void LeastResistanceTest()
+        {
+            Circuit sim = new Circuit();
 
-			sim.Connect(volt0, 0, res0,    0);
-			sim.Connect(volt0, 0, res1,    0);
-			sim.Connect(res0,  1, ground0, 0);
-			sim.Connect(res1,  1, ground1, 0);
+            VoltageInput volt0 = sim.Create<VoltageInput>(Voltage.WaveType.DC);
+            Resistor res0 = sim.Create<Resistor>(100);
+            Resistor res1 = sim.Create<Resistor>(1000);
+            Ground ground0 = sim.Create<Ground>();
+            Ground ground1 = sim.Create<Ground>();
 
-			for(int x = 1; x <= 100; x++)
-				sim.doTick();
-			
-			TestUtils.Compare(ground0.getCurrent(), 0.05, 8);
-			TestUtils.Compare(ground1.getCurrent(), 0.005, 8);
-		}
+            sim.Connect(volt0, 0, res0, 0);
+            sim.Connect(volt0, 0, res1, 0);
+            sim.Connect(res0, 1, ground0, 0);
+            sim.Connect(res1, 1, ground1, 0);
 
-		[TestCase( 2)]
-		[TestCase( 4)]
-		[TestCase( 6)]
-		[TestCase( 8)]
-		[TestCase(10)]
-		public void LawOfResistorsInSeriesTest(int in0) {
-			Circuit sim = new Circuit();
+            for (int x = 1; x <= 100; x++)
+            {
+                sim.doTick();
+            }
 
-			var volt0 = sim.Create<DCVoltageSource>();
-			var volt1 = sim.Create<DCVoltageSource>();
-			var resCompare = sim.Create<Resistor>(in0 * 100);
+            TestUtils.Compare(ground0.getCurrent(), 0.05, 8);
+            TestUtils.Compare(ground1.getCurrent(), 0.005, 8);
+        }
 
-			List<Resistor> resistors = new List<Resistor>();
-			for(int i = 0; i < in0; i++)
-				resistors.Add(sim.Create<Resistor>());
+        [TestCase(2)]
+        [TestCase(4)]
+        [TestCase(6)]
+        [TestCase(8)]
+        [TestCase(10)]
+        public void LawOfResistorsInSeriesTest(int in0)
+        {
+            Circuit sim = new Circuit();
 
-			sim.Connect(volt0.leadPos, resistors.First().leadIn);
-			
-			for(int i = 1; i < in0 - 1; i++)
-				sim.Connect(resistors[i - 1].leadOut, resistors[i].leadIn);
-			
-			sim.Connect(volt0.leadNeg, resistors.Last().leadOut);
+            DCVoltageSource volt0 = sim.Create<DCVoltageSource>();
+            DCVoltageSource volt1 = sim.Create<DCVoltageSource>();
+            Resistor resCompare = sim.Create<Resistor>(in0 * 100);
 
-			sim.Connect(volt1.leadPos, resCompare.leadIn);
-			sim.Connect(resCompare.leadOut, volt1.leadNeg);
+            List<Resistor> resistors = new List<Resistor>();
+            for (int i = 0; i < in0; i++)
+            {
+                resistors.Add(sim.Create<Resistor>());
+            }
 
-			sim.doTicks(100);
+            sim.Connect(volt0.leadPos, resistors.First().leadIn);
 
-			Assert.AreEqual(Math.Round(resistors.Last().getCurrent(), 12), Math.Round(resCompare.getCurrent(), 12));
-		}
+            for (int i = 1; i < in0 - 1; i++)
+            {
+                sim.Connect(resistors[i - 1].leadOut, resistors[i].leadIn);
+            }
 
-		[Test]
-		public void VoltageDividerTest() {
-			Circuit sim = new Circuit();
+            sim.Connect(volt0.leadNeg, resistors.Last().leadOut);
 
-			var volt0 = sim.Create<DCVoltageSource>();
-			volt0.maxVoltage = 10;
+            sim.Connect(volt1.leadPos, resCompare.leadIn);
+            sim.Connect(resCompare.leadOut, volt1.leadNeg);
 
-			var res0 = sim.Create<Resistor>(10000);
-			var res1 = sim.Create<Resistor>(10000);
+            sim.doTicks(100);
 
-			sim.Connect(volt0, 1, res0,  0);
-			sim.Connect(res0,  1, res1,  0);
-			sim.Connect(res1,  1, volt0, 0);
+            Assert.AreEqual(Math.Round(resistors.Last().getCurrent(), 12), Math.Round(resCompare.getCurrent(), 12));
+        }
 
-			var res2 = sim.Create<Resistor>(10000);
-			var res3 = sim.Create<Resistor>(10000);
-			var res4 = sim.Create<Resistor>(10000);
-			var res5 = sim.Create<Resistor>(10000);
+        [Test]
+        public void VoltageDividerTest()
+        {
+            Circuit sim = new Circuit();
 
-			sim.Connect(volt0, 1, res2,  0);
-			sim.Connect(res2,  1, res3,  0);
-			sim.Connect(res3,  1, res4,  0);
-			sim.Connect(res4,  1, res5,  0);
-			sim.Connect(res5,  1, volt0, 0);
+            DCVoltageSource volt0 = sim.Create<DCVoltageSource>();
+            volt0.maxVoltage = 10;
 
-			var out0 = sim.Create<Output>();
-			var out1 = sim.Create<Output>();
-			var out2 = sim.Create<Output>();
-			var out3 = sim.Create<Output>();
+            Resistor res0 = sim.Create<Resistor>(10000);
+            Resistor res1 = sim.Create<Resistor>(10000);
 
-			sim.Connect(out0, 0, res0, 1);
-			sim.Connect(out1, 0, res2, 1);
-			sim.Connect(out2, 0, res3, 1);
-			sim.Connect(out3, 0, res4, 1);
+            sim.Connect(volt0, 1, res0, 0);
+            sim.Connect(res0, 1, res1, 0);
+            sim.Connect(res1, 1, volt0, 0);
 
-			for(int x = 1; x <= 100; x++)
-				sim.doTick();
+            Resistor res2 = sim.Create<Resistor>(10000);
+            Resistor res3 = sim.Create<Resistor>(10000);
+            Resistor res4 = sim.Create<Resistor>(10000);
+            Resistor res5 = sim.Create<Resistor>(10000);
 
-			TestUtils.Compare(res0.getVoltageDelta(), 5.0, 8);
-			TestUtils.Compare(res1.getVoltageDelta(), 5.0, 8);
-			TestUtils.Compare(res2.getVoltageDelta(), 2.5, 8);
-			TestUtils.Compare(res3.getVoltageDelta(), 2.5, 8);
-			TestUtils.Compare(res4.getVoltageDelta(), 2.5, 8);
-			TestUtils.Compare(res5.getVoltageDelta(), 2.5, 8);
+            sim.Connect(volt0, 1, res2, 0);
+            sim.Connect(res2, 1, res3, 0);
+            sim.Connect(res3, 1, res4, 0);
+            sim.Connect(res4, 1, res5, 0);
+            sim.Connect(res5, 1, volt0, 0);
 
-			TestUtils.Compare(out0.getVoltageDelta(), 5.0, 8);
-			TestUtils.Compare(out1.getVoltageDelta(), 7.5, 8);
-			TestUtils.Compare(out2.getVoltageDelta(), 5.0, 8);
-			TestUtils.Compare(out3.getVoltageDelta(), 2.5, 8);
-		}
+            Output out0 = sim.Create<Output>();
+            Output out1 = sim.Create<Output>();
+            Output out2 = sim.Create<Output>();
+            Output out3 = sim.Create<Output>();
 
-		[Test]
-		public void WheatstoneBridgeTest() {
-			Circuit sim = new Circuit();
+            sim.Connect(out0, 0, res0, 1);
+            sim.Connect(out1, 0, res2, 1);
+            sim.Connect(out2, 0, res3, 1);
+            sim.Connect(out3, 0, res4, 1);
 
-			var volt0 = sim.Create<DCVoltageSource>();
+            for (int x = 1; x <= 100; x++)
+            {
+                sim.doTick();
+            }
 
-			var res0 = sim.Create<Resistor>(200);
-			var res1 = sim.Create<Resistor>(400);
-			
-			sim.Connect(volt0, 1, res0, 0);
-			sim.Connect(volt0, 1, res1, 0);
+            TestUtils.Compare(res0.getVoltageDelta(), 5.0, 8);
+            TestUtils.Compare(res1.getVoltageDelta(), 5.0, 8);
+            TestUtils.Compare(res2.getVoltageDelta(), 2.5, 8);
+            TestUtils.Compare(res3.getVoltageDelta(), 2.5, 8);
+            TestUtils.Compare(res4.getVoltageDelta(), 2.5, 8);
+            TestUtils.Compare(res5.getVoltageDelta(), 2.5, 8);
 
-			var wire0 = sim.Create<Wire>();
+            TestUtils.Compare(out0.getVoltageDelta(), 5.0, 8);
+            TestUtils.Compare(out1.getVoltageDelta(), 7.5, 8);
+            TestUtils.Compare(out2.getVoltageDelta(), 5.0, 8);
+            TestUtils.Compare(out3.getVoltageDelta(), 2.5, 8);
+        }
 
-			sim.Connect(wire0, 0, res0, 1);
-			sim.Connect(wire0, 1, res1, 1);
+        [Test]
+        public void WheatstoneBridgeTest()
+        {
+            Circuit sim = new Circuit();
 
-			var res2 = sim.Create<Resistor>(100);
-			var resX = sim.Create<Resistor>(200);
+            DCVoltageSource volt0 = sim.Create<DCVoltageSource>();
 
-			sim.Connect(res0, 1, res2, 0);
-			sim.Connect(res1, 1, resX, 0);
+            Resistor res0 = sim.Create<Resistor>(200);
+            Resistor res1 = sim.Create<Resistor>(400);
 
-			sim.Connect(volt0, 0, res2, 1);
-			sim.Connect(volt0, 0, resX, 1);
+            sim.Connect(volt0, 1, res0, 0);
+            sim.Connect(volt0, 1, res1, 0);
 
-			for(int x = 1; x <= 100; x++)
-				sim.doTick();
+            Wire wire0 = sim.Create<Wire>();
 
-			TestUtils.Compare(0.025, volt0.getCurrent(), 3);
+            sim.Connect(wire0, 0, res0, 1);
+            sim.Connect(wire0, 1, res1, 1);
 
-			TestUtils.Compare(res0.getCurrent(), 0.01666667, 8);
-			TestUtils.Compare(res1.getCurrent(), 0.00833334, 8);
-			TestUtils.Compare(res2.getCurrent(), 0.01666667, 8);
-			TestUtils.Compare(resX.getCurrent(), 0.00833334, 8);
+            Resistor res2 = sim.Create<Resistor>(100);
+            Resistor resX = sim.Create<Resistor>(200);
 
-			Assert.AreEqual(0, wire0.getCurrent());
-		}
+            sim.Connect(res0, 1, res2, 0);
+            sim.Connect(res1, 1, resX, 0);
 
-	}
+            sim.Connect(volt0, 0, res2, 1);
+            sim.Connect(volt0, 0, resX, 1);
+
+            for (int x = 1; x <= 100; x++)
+            {
+                sim.doTick();
+            }
+
+            TestUtils.Compare(0.025, volt0.getCurrent(), 3);
+
+            TestUtils.Compare(res0.getCurrent(), 0.01666667, 8);
+            TestUtils.Compare(res1.getCurrent(), 0.00833334, 8);
+            TestUtils.Compare(res2.getCurrent(), 0.01666667, 8);
+            TestUtils.Compare(resX.getCurrent(), 0.00833334, 8);
+
+            Assert.AreEqual(0, wire0.getCurrent());
+        }
+
+    }
 }

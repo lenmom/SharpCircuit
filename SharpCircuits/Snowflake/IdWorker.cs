@@ -14,12 +14,11 @@ namespace Snowflake
     public class IdWorker
     {
         public const long Twepoch = 1288834974657L;
-
-        const int WorkerIdBits = 5;
-        const int DatacenterIdBits = 5;
-        const int SequenceBits = 12;
-        const long MaxWorkerId = -1L ^ (-1L << WorkerIdBits);
-        const long MaxDatacenterId = -1L ^ (-1L << DatacenterIdBits);
+        private const int WorkerIdBits = 5;
+        private const int DatacenterIdBits = 5;
+        private const int SequenceBits = 12;
+        private const long MaxWorkerId = -1L ^ (-1L << WorkerIdBits);
+        private const long MaxDatacenterId = -1L ^ (-1L << DatacenterIdBits);
 
         private const int WorkerIdShift = SequenceBits;
         private const int DatacenterIdShift = SequenceBits + WorkerIdBits;
@@ -28,23 +27,23 @@ namespace Snowflake
 
         private long _sequence = 0L;
         private long _lastTimestamp = -1L;
-	
-	
-        public IdWorker(long workerId, long datacenterId, long sequence = 0L) 
+
+
+        public IdWorker(long workerId, long datacenterId, long sequence = 0L)
         {
             WorkerId = workerId;
             DatacenterId = datacenterId;
             _sequence = sequence;
-		
+
             // sanity check for workerId
-            if (workerId > MaxWorkerId || workerId < 0) 
+            if (workerId > MaxWorkerId || workerId < 0)
             {
-                throw new ArgumentException( String.Format("worker Id can't be greater than {0} or less than 0", MaxWorkerId) );
+                throw new ArgumentException(string.Format("worker Id can't be greater than {0} or less than 0", MaxWorkerId));
             }
 
             if (datacenterId > MaxDatacenterId || datacenterId < 0)
             {
-                throw new ArgumentException( String.Format("datacenter Id can't be greater than {0} or less than 0", MaxDatacenterId));
+                throw new ArgumentException(string.Format("datacenter Id can't be greater than {0} or less than 0", MaxDatacenterId));
             }
 
             //log.info(
@@ -52,9 +51,9 @@ namespace Snowflake
             //                  TimestampLeftShift, DatacenterIdBits, WorkerIdBits, SequenceBits, workerId)
             //    );	
         }
-	
-        public long WorkerId {get; protected set;}
-        public long DatacenterId {get; protected set;}
+
+        public long WorkerId { get; protected set; }
+        public long DatacenterId { get; protected set; }
 
         public long Sequence
         {
@@ -64,46 +63,48 @@ namespace Snowflake
 
         // def get_timestamp(CirSim sim) = System.currentTimeMillis
 
-        readonly object _lock = new Object();
-	
-        public virtual long NextId() 
-        {
-            lock(_lock) 
-            {
-                var timestamp = TimeGen();
+        private readonly object _lock = new object();
 
-                if (timestamp < _lastTimestamp) 
+        public virtual long NextId()
+        {
+            lock (_lock)
+            {
+                long timestamp = TimeGen();
+
+                if (timestamp < _lastTimestamp)
                 {
                     //exceptionCounter.incr(1);
                     //log.Error("clock is moving backwards.  Rejecting requests until %d.", _lastTimestamp);
-                    throw new InvalidSystemClock(String.Format(
+                    throw new InvalidSystemClock(string.Format(
                         "Clock moved backwards.  Refusing to generate id for {0} milliseconds", _lastTimestamp - timestamp));
                 }
 
-                if (_lastTimestamp == timestamp) 
+                if (_lastTimestamp == timestamp)
                 {
                     _sequence = (_sequence + 1) & SequenceMask;
-                    if (_sequence == 0) 
+                    if (_sequence == 0)
                     {
                         timestamp = TilNextMillis(_lastTimestamp);
                     }
-                } else {
+                }
+                else
+                {
                     _sequence = 0;
                 }
 
                 _lastTimestamp = timestamp;
-                var id = ((timestamp - Twepoch) << TimestampLeftShift) |
+                long id = ((timestamp - Twepoch) << TimestampLeftShift) |
                          (DatacenterId << DatacenterIdShift) |
                          (WorkerId << WorkerIdShift) | _sequence;
-					
+
                 return id;
             }
         }
 
         protected virtual long TilNextMillis(long lastTimestamp)
         {
-            var timestamp = TimeGen();
-            while (timestamp <= lastTimestamp) 
+            long timestamp = TimeGen();
+            while (timestamp <= lastTimestamp)
             {
                 timestamp = TimeGen();
             }
@@ -113,6 +114,6 @@ namespace Snowflake
         protected virtual long TimeGen()
         {
             return System.CurrentTimeMillis();
-        }      
+        }
     }
 }
