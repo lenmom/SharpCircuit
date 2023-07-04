@@ -1,6 +1,8 @@
 namespace SharpCircuit
 {
-
+    /// <summary>
+    /// 电感器,在电路中因为存在电磁感应的效果，所以存在一定的电感性，能够起到阻止电流变化的作用.
+    /// </summary>
     public class InductorElm : CircuitElement
     {
 

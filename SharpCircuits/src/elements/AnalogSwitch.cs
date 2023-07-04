@@ -1,6 +1,9 @@
 namespace SharpCircuit
 {
-
+    /// <summary>
+    /// 模拟开关主要是完成信号链路中的信号切换功能。
+    /// 采用MOS管的开关方式实现了对信号链路关断或者打开；由于其功能类似于开关，而用模拟器件的特性实现，称为模拟开关
+    /// </summary>
     public class AnalogSwitch : CircuitElement
     {
 

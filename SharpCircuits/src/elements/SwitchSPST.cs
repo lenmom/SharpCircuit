@@ -1,6 +1,8 @@
 namespace SharpCircuit
 {
-
+    /// <summary>
+    /// 单刀单掷开关
+    /// </summary>
     public class SwitchSPST : CircuitElement
     {
 

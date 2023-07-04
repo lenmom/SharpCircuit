@@ -1,6 +1,8 @@
 namespace SharpCircuit
 {
-
+    /// <summary>
+    /// µç×èÆ÷
+    /// </summary>
     public class Resistor : CircuitElement
     {
 

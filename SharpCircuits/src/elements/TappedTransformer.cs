@@ -1,6 +1,8 @@
 namespace SharpCircuit
 {
-
+    /// <summary>
+    /// 抽头变压器,通过改变绕组匝数的方法来调节输入电压与输出电压的关系.
+    /// </summary>
     public class TappedTransformer : CircuitElement
     {
 

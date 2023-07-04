@@ -1,6 +1,8 @@
 namespace SharpCircuit
 {
-
+    /// <summary>
+    /// ¶þ¼«¹Ü
+    /// </summary>
     public class DiodeElm : CircuitElement
     {
 

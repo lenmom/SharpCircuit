@@ -2,7 +2,11 @@ using System;
 
 namespace SharpCircuit
 {
-
+    /// <summary>
+    /// 三极管,实现电流放大.其作用是把微弱信号放大成幅度值较大的电信号，也用作无触点开关。
+    /// 三极管是在一块半导体基片上制作两个相距很近的PN结，
+    /// 两个PN结把整块半导体分成三部分，中间部分是基区，两侧部分是发射区和集电区，排列方式有PNP和NPN两种。
+    /// </summary>
     public class Triode : CircuitElement
     {
 

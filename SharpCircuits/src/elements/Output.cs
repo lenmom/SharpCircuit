@@ -1,9 +1,7 @@
 ﻿namespace SharpCircuit
 {
-
     public class Output : CircuitElement
     {
-
         public Circuit.Lead leadIn { get { return lead0; } }
 
         public override int getLeadCount()

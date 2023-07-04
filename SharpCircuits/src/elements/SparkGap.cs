@@ -2,7 +2,11 @@ using System;
 
 namespace SharpCircuit
 {
-
+    /// <summary>
+    /// 半导体放电管,是一种过压保护器件，是利用晶闸管原理制成的，依靠PN结的击穿电流触发器件导通放电，
+    /// 可以流SPG强效应玻璃放电管是一种靠內部微间隙放电的一种保护器件，在电极微间隙之间充有稳定的隋性气体，
+    /// 并采用玻璃壳和杜镁丝头在高温下烧结密封而形成的.
+    /// </summary>
     public class SparkGap : CircuitElement
     {
 

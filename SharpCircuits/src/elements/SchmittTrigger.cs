@@ -2,9 +2,11 @@ using System;
 
 namespace SharpCircuit
 {
-
-    // Contributed by Edward Calver.
-
+    /// <summary>
+    /// 施密特触发器有两个稳定状态，但与一般触发器不同的是，施密特触发器采用电位触发方式，其状态由输入信号电位维持；
+    /// 对于负向递减和正向递增两种不同变化方向的输入信号，施密特触发器有不同的阈值电压。
+    /// Contributed by Edward Calver.
+    /// </summary>
     public class SchmittTrigger : InvertingSchmittTrigger
     {
 

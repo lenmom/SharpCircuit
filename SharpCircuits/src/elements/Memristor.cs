@@ -1,6 +1,8 @@
 namespace SharpCircuit
 {
-
+    /// <summary>
+    /// 记忆电阻,忆阻的阻值是由流经它的电荷确定。因此，通过测定忆阻的阻值，便可知道流经它的电荷量，从而有记忆电荷的作用.
+    /// </summary>
     public class Memristor : CircuitElement
     {
 

@@ -2,7 +2,11 @@ using System;
 
 namespace SharpCircuit
 {
-
+    /// <summary>
+    /// MOSFET金属-氧化物半导体场效应晶体管，简称金氧半场效晶体管
+    /// (Metal-Oxide-Semiconductor Field-Effect Transistor, MOSFET)
+    /// 
+    /// </summary>
     public class Mosfet : CircuitElement
     {
 

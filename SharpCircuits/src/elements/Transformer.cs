@@ -2,7 +2,9 @@ using System;
 
 namespace SharpCircuit
 {
-
+    /// <summary>
+    /// ±äÑ¹Æ÷
+    /// </summary>
     public class Transformer : CircuitElement
     {
 

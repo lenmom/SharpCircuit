@@ -2,10 +2,11 @@ using System;
 
 namespace SharpCircuit
 {
-
+    /// <summary>
+    /// 晶体管,泛指一切以半导体材料为基础的单一元件，包括各种半导体材料制成的二极管、三极管、场效应管、晶闸管等
+    /// </summary>
     public class Transistor : CircuitElement
     {
-
         private static readonly double leakage = 1E-13; // 1e-6;
         private static readonly double vt = 0.025;
         private static readonly double vdcoef = 1 / vt;

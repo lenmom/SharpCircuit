@@ -2,7 +2,11 @@ using System;
 
 namespace SharpCircuit
 {
-
+    /// <summary>
+    /// 运算放大器,是具有很高放大倍数的电路单元。在实际电路中，通常结合反馈网络共同组成某种功能模块。
+    /// 它是一种带有特殊耦合电路及反馈的放大器。其输出信号可以是输入信号加、减或微分、积分等数学运算的结果。
+    /// 由于早期应用于模拟计算机中用以实现数学运算，因而得名“运算放大器”
+    /// </summary>
     public class OpAmp : CircuitElement
     {
 

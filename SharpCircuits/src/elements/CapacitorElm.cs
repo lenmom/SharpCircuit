@@ -1,6 +1,8 @@
 namespace SharpCircuit
 {
-
+    /// <summary>
+    /// µçÈÝÆ÷
+    /// </summary>
     public class CapacitorElm : CircuitElement
     {
 

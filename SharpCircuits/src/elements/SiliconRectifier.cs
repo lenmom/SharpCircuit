@@ -2,14 +2,15 @@ using System;
 
 namespace SharpCircuit
 {
-
-    // Silicon-Controlled Rectifier
-    // 3 nodes, 1 internal node
-    // 0 = anode, 1 = cathode, 2 = gate
-    // 0, 3 = variable resistor
-    // 3, 2 = diode
-    // 2, 1 = 50 ohm resistor
-
+    /// <summary>
+    /// 硅整流器：是一种以可控硅（电力电子功率器件）为基础，以智能数字控制电路为核心的电源功率控制电器.
+    /// Silicon-Controlled Rectifier
+    /// 3 nodes, 1 internal node
+    /// 0 = anode, 1 = cathode, 2 = gate
+    /// 0, 3 = variable resistor
+    /// 3, 2 = diode
+    /// 2, 1 = 50 ohm resistor
+    /// </summary>
     public class SiliconRectifier : CircuitElement
     {
 

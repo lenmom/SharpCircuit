@@ -1,6 +1,8 @@
 ﻿namespace SharpCircuit
 {
-
+    /// <summary>
+    /// 单刀双掷(Single Pole Double Throw)开关
+    /// </summary>
     public class SwitchSPDT : SwitchSPST
     {
 

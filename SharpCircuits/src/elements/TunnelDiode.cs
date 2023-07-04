@@ -2,7 +2,10 @@ using System;
 
 namespace SharpCircuit
 {
-
+    /// <summary>
+    ///  隧道二极管,它是以隧道效应电流为主要电流分量的晶体二极管,是采用砷化镓(GaAs)和锑化镓(GaSb)等材料混合制成的半导体二极管，
+    ///  其优点是开关特性好，速度快、工作频率高;缺点是热稳定性较差。一般应用于某些开关电路或高频振荡等电路中。
+    /// </summary>
     public class TunnelDiode : CircuitElement
     {
 
