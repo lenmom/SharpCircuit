@@ -18,11 +18,11 @@ namespace SharpCircuitTest
         /// </summary>
         /// <param name="totalEnable">if the total switch is closed.</param>
         /// <param name="clockwise">if the control circute is reverse direction.</param>
-        [TestCase(true, true)]
-        [TestCase(true, false)]
-        [TestCase(false, true)]
-        [TestCase(false, false)]
-        public void SwitchSPSTTest(bool totalEnable, bool clockwise)
+        [TestCase(true, true, 0.005)]
+        [TestCase(true, false, 0.200)]
+        [TestCase(false, true, 0.400)]
+        [TestCase(false, false, 0.5)]
+        public void SwitchSPSTTest(bool totalEnable, bool clockwise, double resisterPosition)
         {
             Circuit sim = new Circuit();
 
@@ -34,7 +34,9 @@ namespace SharpCircuitTest
             SwitchSPST switchC = sim.Create<SwitchSPST>(true);
             SwitchSPST switchD = sim.Create<SwitchSPST>(true);
 
-            Resistor resistor = sim.Create<Resistor>();
+            //Resistor resistor = sim.Create<Resistor>();
+            Potentiometer resistor = sim.Create<Potentiometer>();
+            resistor.position = resisterPosition;
 
             Ground grndTop = sim.Create<Ground>();
             Ground grndBottom = sim.Create<Ground>();
@@ -131,18 +133,19 @@ namespace SharpCircuitTest
         /// </summary>
         /// <param name="totalEnable">if the total switch is closed.</param>
         /// <param name="reverse">if the control circute is reverse direction.</param>
-        [TestCase(true, true)]
-        //[TestCase(true, false)]
-        //[TestCase(false, true)]
-        //[TestCase(false, false)]
-        public void SwitchSPSTTest1(bool totalEnable, bool reverse)
+        [TestCase(true, true, 0.005)]
+        [TestCase(true, false, 0.200)]
+        [TestCase(false, true, 0.400)]
+        [TestCase(false, false, 0.5)]
+        public void SwitchSPSTPotentiometerTest(bool totalEnable, bool reverse, double resisterPosition)
         {
             Circuit sim = new Circuit();
 
             VoltageInput dcVoltageSource = sim.Create<VoltageInput>(Voltage.WaveType.AC);
             SwitchSPST switchTotal = sim.Create<SwitchSPST>(true);
 
-            Resistor resistor = sim.Create<Resistor>();
+            Potentiometer resistor = sim.Create<Potentiometer>();
+            resistor.position = resisterPosition;
 
             Ground grndTop = sim.Create<Ground>();
 
