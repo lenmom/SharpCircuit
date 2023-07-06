@@ -245,15 +245,13 @@ namespace SharpCircuitTest
         /// </summary>
         /// <param name="totalEnable">if the total switch is closed.</param>
         /// <param name="reverse">if the control circute is reverse direction.</param>
-        [TestCase(true, true, 0.005)]
-        [TestCase(true, false, 0.200)]
-        [TestCase(false, true, 0.400)]
-        [TestCase(false, false, 0.5)]
-        public void SwitchSPSTResistorTest2(bool totalEnable, bool reverse, double resisterPosition)
+        [TestCase(true, 5, 0.05)]
+        [TestCase(false, 0, 0)]
+        public void SwitchSPSTResistorDCTest(bool switchEnable, double voltVal, double currentVal)
         {
             Circuit sim = new Circuit();
 
-            VoltageInput dcVoltageSource = sim.Create<VoltageInput>(Voltage.WaveType.AC);
+            VoltageInput dcVoltageSource = sim.Create<VoltageInput>(Voltage.WaveType.DC);
             SwitchSPST switchTotal = sim.Create<SwitchSPST>(true);
 
             Resistor resistor = sim.Create<Resistor>();
@@ -269,33 +267,17 @@ namespace SharpCircuitTest
             sim.Connect(resistor.leadIn, logicIn.leadIn);
             sim.Connect(resistor.leadOut, logicOut.leadIn);
 
-            switchTotal.toggle();
-            sim.analyze();
-            //sim.Connect(logicOutTop, 0, resistor, 0);
-            //sim.Connect(logicOutBottom, 0, resistor, 1);
-
-            List<ScopeFrame> logicInScope = sim.Watch(logicIn);
-            List<ScopeFrame> logicOutScope = sim.Watch(logicOut);
-
-            double cycleTime = 1 / dcVoltageSource.frequency;
-            double quarterCycleTime = cycleTime / 4;
-
-            int steps = (int)(cycleTime / sim.timeStep);
-            for (int x = 1; x <= steps; x++)
+            if (switchEnable)
             {
-                sim.doTick();
+                switchTotal.toggle();
             }
 
-            double voltageInHigh = logicInScope.Max((f) => f.voltage);
-            double voltageOutHigh = logicOutScope.Max((f) => f.voltage);
-            int voltageInHighNdx = logicInScope.FindIndex((f) => f.voltage == voltageInHigh);
-            int voltageOutHighNdx = logicOutScope.FindIndex((f) => f.voltage == voltageInHigh);
+            sim.analyze();
+            sim.doTicks(100);
 
-            string a = logicIn.GetVoltageString();
-            string b = logicOut.GetVoltageString();
-
-            TestUtils.Compare(voltageInHigh, dcVoltageSource.dutyCycle, 4);
-            TestUtils.Compare(logicInScope[voltageInHighNdx].time, quarterCycleTime, 4);
+            Assert.AreEqual(voltVal, logicIn.getLeadVoltage(0));
+            Assert.AreEqual(0, logicOut.getLeadVoltage(0));
+            Assert.AreEqual(currentVal, resistor.getCurrent());
         }
     }
 }
