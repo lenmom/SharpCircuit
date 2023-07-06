@@ -73,6 +73,7 @@
     <Compile Include="src\MosfetTest.cs" />
     <Compile Include="src\TransistorTest.cs" />
     <Compile Include="src\TriStateBufferTest.cs" />
+    <Compile Include="src\FluidTest.cs" />
     <Compile Include="src\VoltageWaveTest.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -56,6 +56,7 @@ public static class Debug
         }
 
         Console.WriteLine(sb.ToString());
+        System.Diagnostics.Debug.WriteLine(sb.ToString());
     }
 
     public static void LogF(string format, params object[] objs)

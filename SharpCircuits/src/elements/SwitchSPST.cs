@@ -5,28 +5,46 @@ namespace SharpCircuit
     /// </summary>
     public class SwitchSPST : CircuitElement
     {
+        #region Field
+
+        /// <summary>
+        /// position 0 == closed, position 1 == open
+        /// </summary>
+        protected int position { get; private set; }
+
+        protected int posCount = 2;
+
+        #endregion
+
+        #region Property
 
         public Circuit.Lead leadA { get { return lead0; } }
-        public Circuit.Lead leadB { get { return lead1; } }
 
-        // position 0 == closed, position 1 == open
-        protected int position { get; private set; }
+        public Circuit.Lead leadB { get { return lead1; } }
 
         public bool IsOpen { get { return position == 1; } }
 
-        protected int posCount;
+        #endregion
 
-        public SwitchSPST() : base()
+        #region Constructor
+
+        /// <summary>
+        /// Create new instance of <c>SwitchSPST</c>  which is closed state in default.
+        /// </summary>
+        public SwitchSPST() : this(false)
         {
-            position = 0;
+            // Nothing to do.            
+        }
+
+        public SwitchSPST(bool isOpen) : base()
+        {
+            position = (isOpen) ? 1 : 0;
             posCount = 2;
         }
 
-        public SwitchSPST(bool mm)
-        {
-            position = (mm) ? 1 : 0;
-            posCount = 2;
-        }
+        #endregion
+
+        #region Public Method
 
         public virtual void toggle()
         {
@@ -37,6 +55,13 @@ namespace SharpCircuit
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pos"> 
+        /// 0 or greater than 1, closed, 
+        /// 1 , open
+        /// </param>
         public virtual void setPosition(int pos)
         {
             position = pos;
@@ -89,5 +114,6 @@ namespace SharpCircuit
             return true;
         }
 
+        #endregion
     }
 }
