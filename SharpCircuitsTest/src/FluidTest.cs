@@ -249,15 +249,14 @@ namespace SharpCircuitTest
         [TestCase(true, false, 0.200)]
         [TestCase(false, true, 0.400)]
         [TestCase(false, false, 0.5)]
-        public void SwitchSPSTPotentiometerTest(bool totalEnable, bool reverse, double resisterPosition)
+        public void SwitchSPSTResistorTest2(bool totalEnable, bool reverse, double resisterPosition)
         {
             Circuit sim = new Circuit();
 
             VoltageInput dcVoltageSource = sim.Create<VoltageInput>(Voltage.WaveType.AC);
             SwitchSPST switchTotal = sim.Create<SwitchSPST>(true);
 
-            Potentiometer resistor = sim.Create<Potentiometer>();
-            resistor.position = resisterPosition;
+            Resistor resistor = sim.Create<Resistor>();
 
             Ground grndTop = sim.Create<Ground>();
 
