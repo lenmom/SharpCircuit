@@ -220,31 +220,6 @@ namespace SharpCircuitTest
                 Assert.AreEqual(current1, current2);
                 Assert.AreEqual(current1, 0);
             }
-            
-
-            //if (totalEnable)
-            //{
-            //    if (clockwise)
-            //    {
-            //        TestUtils.Compare(voltageBottomHigh, dcVoltageSource.dutyCycle, 4);
-            //        TestUtils.Compare(logicOutBottomScope[voltageBottomHighNdx].time, quarterCycleTime, 4);
-            //    }
-            //    else
-            //    {
-            //        TestUtils.Compare(voltageTopHigh, dcVoltageSource.dutyCycle, 4);
-            //        TestUtils.Compare(logicOutTopScope[voltageTopHighNdx].time, quarterCycleTime, 4);
-            //    }
-            //}
-            //else
-            //{
-            //    Assert.AreEqual(voltageTopHigh, 0);
-            //    Assert.AreEqual(voltageBottomHigh, 0);
-            //}
-
-            double a = logicOutTop.getLeadVoltage(0);
-            double b = logicOutBottom.getLeadVoltage(0);
-
-
         }
 
         /// <summary>
