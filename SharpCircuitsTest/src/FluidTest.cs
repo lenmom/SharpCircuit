@@ -139,7 +139,7 @@ namespace SharpCircuitTest
         {
             Circuit sim = new Circuit();
 
-            VoltageInput dcVoltageSource = sim.Create<VoltageInput>(Voltage.WaveType.AC);
+            VoltageInput dcVoltageSource = sim.Create<VoltageInput>(Voltage.WaveType.DC);
             SwitchSPST switchTotal = sim.Create<SwitchSPST>(true);
 
             SwitchSPST switchA = sim.Create<SwitchSPST>(true);
@@ -198,46 +198,53 @@ namespace SharpCircuitTest
                 }
             }
 
-            List<ScopeFrame> logicOutTopScope = sim.Watch(logicOutTop);
-            List<ScopeFrame> logicOutBottomScope = sim.Watch(logicOutBottom);
 
-            double cycleTime = 1 / dcVoltageSource.frequency;
-            double quarterCycleTime = cycleTime / 4;
-
-            int steps = (int)(cycleTime / sim.timeStep);
             sim.analyze();
-            for (int x = 1; x <= steps; x++)
-            {
-                sim.doTick();
-            }
+            sim.doTick();
 
-            double voltageTopHigh = logicOutTopScope.Max((f) => f.voltage);
-            int voltageTopHighNdx = logicOutTopScope.FindIndex((f) => f.voltage == voltageTopHigh);
+            double current1 = resistor.current2;
 
-            double voltageBottomHigh = logicOutBottomScope.Max((f) => f.voltage);
-            int voltageBottomHighNdx = logicOutBottomScope.FindIndex((f) => f.voltage == voltageBottomHigh);
+            resistor.position =+ 0.01;
+
+            sim.analyze();
+            sim.doTick();
+
+            double current2 = resistor.current2;
 
             if (totalEnable)
             {
-                if (clockwise)
-                {
-                    TestUtils.Compare(voltageBottomHigh, dcVoltageSource.dutyCycle, 4);
-                    TestUtils.Compare(logicOutBottomScope[voltageBottomHighNdx].time, quarterCycleTime, 4);
-                }
-                else
-                {
-                    TestUtils.Compare(voltageTopHigh, dcVoltageSource.dutyCycle, 4);
-                    TestUtils.Compare(logicOutTopScope[voltageTopHighNdx].time, quarterCycleTime, 4);
-                }
+                Assert.Less(current1, current2);
             }
             else
             {
-                Assert.AreEqual(voltageTopHigh, 0);
-                Assert.AreEqual(voltageBottomHigh, 0);
+                Assert.AreEqual(current1, current2);
+                Assert.AreEqual(current1, 0);
             }
+            
 
-            string a = logicOutTop.GetVoltageString();
-            string b = logicOutBottom.GetVoltageString();
+            //if (totalEnable)
+            //{
+            //    if (clockwise)
+            //    {
+            //        TestUtils.Compare(voltageBottomHigh, dcVoltageSource.dutyCycle, 4);
+            //        TestUtils.Compare(logicOutBottomScope[voltageBottomHighNdx].time, quarterCycleTime, 4);
+            //    }
+            //    else
+            //    {
+            //        TestUtils.Compare(voltageTopHigh, dcVoltageSource.dutyCycle, 4);
+            //        TestUtils.Compare(logicOutTopScope[voltageTopHighNdx].time, quarterCycleTime, 4);
+            //    }
+            //}
+            //else
+            //{
+            //    Assert.AreEqual(voltageTopHigh, 0);
+            //    Assert.AreEqual(voltageBottomHigh, 0);
+            //}
+
+            double a = logicOutTop.getLeadVoltage(0);
+            double b = logicOutBottom.getLeadVoltage(0);
+
+
         }
 
         /// <summary>

@@ -6,9 +6,29 @@ namespace SharpCircuit
     /// </summary>
     public class Potentiometer : CircuitElement
     {
+        #region Field
+
+        private const double DefaultMaxResistance = 1000;
+        private const double DefaultPosition = 0.5;
+
+        /// <summary>
+        /// maxResistance * position
+        /// </summary>
+        private double resistance1;
+
+        /// <summary>
+        /// maxResistance * (1 - position)
+        /// </summary>
+        private double resistance2;
+
+        #endregion
+
+        #region Property
 
         public Circuit.Lead leadOut { get { return lead0; } }
+
         public Circuit.Lead leadIn { get { return lead1; } }
+
         public Circuit.Lead leadVoltage { get { return new Circuit.Lead(this, 2); } }
 
         public double position { get; set; }
@@ -18,17 +38,34 @@ namespace SharpCircuit
         /// </summary>
         public double maxResistance { get; set; }
 
-        private double resistance1;
-        private double resistance2;
-        private double current1;
-        private double current2;
-        private double current3;
+        /// <summary>
+        /// (lead_volt[0] - lead_volt[2]) / resistance1
+        /// </summary>
+        public double current1 { get; private set; }
+
+        /// <summary>
+        /// (lead_volt[1] - lead_volt[2]) / resistance2
+        /// </summary>
+        public double current2 { get; private set; }
+
+        /// <summary>
+        ///  -current1 - current2
+        /// </summary>
+        public double current3 { get; private set; }
+
+        #endregion
+
+        #region Constructor
 
         public Potentiometer() : base()
         {
-            maxResistance = 1000;
-            position = 0.5;
+            maxResistance = DefaultMaxResistance;
+            position = DefaultPosition;
         }
+
+        #endregion
+
+        #region Public Method
 
         public override int getLeadCount()
         {
@@ -51,13 +88,14 @@ namespace SharpCircuit
         }
 
         /*public override void getInfo(String[] arr) {
-			arr[0] = "potentiometer";
-			//arr[1] = "Vd = " + getVoltageDText(getVoltageDiff());
-			arr[2] = "R1 = " + getUnitText(resistance1, Circuit.ohmString);
-			arr[3] = "R2 = " + getUnitText(resistance2, Circuit.ohmString);
-			arr[4] = "I1 = " + getCurrentDText(current1);
-			arr[5] = "I2 = " + getCurrentDText(current2);
-		}*/
+            arr[0] = "potentiometer";
+            //arr[1] = "Vd = " + getVoltageDText(getVoltageDiff());
+            arr[2] = "R1 = " + getUnitText(resistance1, Circuit.ohmString);
+            arr[3] = "R2 = " + getUnitText(resistance2, Circuit.ohmString);
+            arr[4] = "I1 = " + getCurrentDText(current1);
+            arr[5] = "I2 = " + getCurrentDText(current2);
+        }*/
 
+        #endregion
     }
 }
